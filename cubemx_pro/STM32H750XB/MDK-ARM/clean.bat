@@ -14,7 +14,7 @@ DEL /F/S/Q *.htm
 DEL /F/S/Q *.lnp
 DEL /F/S/Q *.sct
 DEL /F/S/Q *.iex
-DEL /F/S/Q *.hex
+
 
 DEL /F/S/Q *.Administrator
 DEL /F/S/Q JLinkLog.txt
