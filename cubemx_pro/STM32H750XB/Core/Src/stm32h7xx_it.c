@@ -22,10 +22,15 @@
 #include "stm32h7xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "bsp.h"
+#include "app.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
+ volatile uint32_t buttonPressTime = 0;
+ volatile uint8_t buttonPressCount = 0;
 
 /* USER CODE END TD */
 
@@ -200,12 +205,29 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles EXTI line4 interrupt.
+  */
+void EXTI4_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI4_IRQn 0 */
+
+  /* USER CODE END EXTI4_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(USER_KEY_Pin);
+  /* USER CODE BEGIN EXTI4_IRQn 1 */
+
+  /* USER CODE END EXTI4_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM7 global interrupt.
   */
 void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */
   static int num;
+  
+  // 调用按键处理函数
+ //Button_Process();
   /* USER CODE END TIM7_IRQn 0 */
   HAL_TIM_IRQHandler(&htim7);
   /* USER CODE BEGIN TIM7_IRQn 1 */
@@ -218,5 +240,46 @@ void TIM7_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+void key_process(void)
+{
+ if(HAL_GPIO_ReadPin(USER_KEY_GPIO_Port,USER_KEY_Pin)==RESET)
+   {
+      // 按键释放时的处理
+      uint32_t currentTime = HAL_GetTick();
+      uint32_t pressDuration = currentTime - buttonPressTime;
+
+       if (pressDuration<800&&pressDuration>20) {
+        // 短按键处理
+				 LED_R_ON;
+				
+
+      } else {
+        // 长按键处理
+			   buttonPressCount = 0;
+				// 执行长按键事件处理
+				 LED_R_OFF;
+
+        
+      }
+    }
+
+}
+
+
+
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	
+  if(GPIO_Pin==USER_KEY_Pin)
+	 {
+	  buttonPressTime = HAL_GetTick();
+	 }
+
+
+}
+
+
 
 /* USER CODE END 1 */

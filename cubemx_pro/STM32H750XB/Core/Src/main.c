@@ -18,11 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "bsp.h"
+#include <stdio.h>
+#include "stm32h7xx_it.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -89,10 +92,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
-
-  HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+  //µ„¡¡
+	
+	
+//	 LED_R_ON;
+//	 LED_B_ON;
+   printf("STM32H750XB !!!");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,9 +107,12 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    //
     /* USER CODE BEGIN 3 */
-  }
+	   key_process();
+		
+	}
+  
   /* USER CODE END 3 */
 }
 
