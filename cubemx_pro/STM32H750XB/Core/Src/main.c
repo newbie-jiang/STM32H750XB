@@ -54,6 +54,7 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
  int numerical_value;
+extern int buzzer_flag;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -133,12 +134,15 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	   //key_process();
 		/*PC3½ÓµçÎ»Æ÷²âÊÔ*/
-		HAL_Delay(500);
-    numerical_value=(int)readInternalVoltage();
-		printf("%d\r\n",numerical_value);
-   
+//		HAL_Delay(500);
+//    numerical_value=(int)readInternalVoltage();
+//		printf("%d\r\n",numerical_value);
+   buzzer_flag=1;
 
-
+//    BUZZER_ON;
+//		HAL_Delay(100);
+//    BUZZER_OFF;		
+//		HAL_Delay(2000);
 	}
   
   /* USER CODE END 3 */

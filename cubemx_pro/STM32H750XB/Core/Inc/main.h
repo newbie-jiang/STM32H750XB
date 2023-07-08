@@ -70,8 +70,15 @@ void Error_Handler(void);
 #define USER_KEY_EXTI_IRQn EXTI4_IRQn
 #define PB2_Pin GPIO_PIN_2
 #define PB2_GPIO_Port GPIOB
+#define BUZZER_Pin GPIO_PIN_0
+#define BUZZER_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+#define BUZZER_ON    HAL_GPIO_WritePin(GPIOB, PB2_Pin|BUZZER_Pin, GPIO_PIN_SET)
+#define BUZZER_OFF   HAL_GPIO_WritePin(GPIOB, PB2_Pin|BUZZER_Pin, GPIO_PIN_RESET)
+
+
+
 
 /* USER CODE END Private defines */
 

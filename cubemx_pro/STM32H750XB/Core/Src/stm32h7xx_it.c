@@ -31,7 +31,7 @@
 /* USER CODE BEGIN TD */
  volatile uint32_t buttonPressTime = 0;
  volatile uint8_t buttonPressCount = 0;
-
+ int buzzer_flag;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -218,6 +218,7 @@ void EXTI4_IRQHandler(void)
   /* USER CODE END EXTI4_IRQn 1 */
 }
 
+
 /**
   * @brief This function handles TIM7 global interrupt.
   */
@@ -225,7 +226,12 @@ void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */
   static int num;
+	static uint16_t buzzer_count;
   
+
+	
+ int BUZZER_ON_TIME_MS =100;
+ int BUZZER_OFF_TIME_MS= 2000;
   // 调用按键处理函数
  //Button_Process();
   /* USER CODE END TIM7_IRQn 0 */
@@ -236,6 +242,24 @@ void TIM7_IRQHandler(void)
 	if(num)
 	HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
 	/***************************************************/
+ 
+	/*********************BUZZER*************************/
+	if(buzzer_flag==1)
+	{
+	     buzzer_count++;
+    if (buzzer_count == 1) {
+        BUZZER_ON; 
+	    }
+		else if (buzzer_count >= 100) {
+        BUZZER_OFF;
+			
+    if (buzzer_count >= 2100) {
+        buzzer_count = 0;
+       }
+    }
+   	buzzer_flag=0;	
+	}
+  /***************************************************/
   /* USER CODE END TIM7_IRQn 1 */
 }
 
