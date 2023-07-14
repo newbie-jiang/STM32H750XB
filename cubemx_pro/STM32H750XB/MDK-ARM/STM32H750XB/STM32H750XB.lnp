@@ -3,6 +3,7 @@
 "stm32h750xb\main.o"
 "stm32h750xb\gpio.o"
 "stm32h750xb\adc.o"
+"stm32h750xb\tim.o"
 "stm32h750xb\usart.o"
 "stm32h750xb\stm32h7xx_it.o"
 "stm32h750xb\stm32h7xx_hal_msp.o"

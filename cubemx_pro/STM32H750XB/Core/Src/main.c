@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -115,6 +116,7 @@ int main(void)
   MX_GPIO_Init();
   MX_UART4_Init();
   MX_ADC3_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   //µãÁÁ
 	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//Ð£×¼ADC
@@ -122,7 +124,9 @@ int main(void)
 	
 //	 LED_R_ON;
 //	 LED_B_ON;
-   printf("STM32H750XB !!!");
+   printf("STM32H750XB !!!\r\n");
+	 HAL_TIM_Base_Start_IT(&htim6);
+	 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -137,12 +141,20 @@ int main(void)
 //		HAL_Delay(500);
 //    numerical_value=(int)readInternalVoltage();
 //		printf("%d\r\n",numerical_value);
-   buzzer_flag=1;
+//  buzzer_flag=1;
 
 //    BUZZER_ON;
 //		HAL_Delay(100);
 //    BUZZER_OFF;		
 //		HAL_Delay(2000);
+		
+		
+		uint32_t code=scan_irda();
+		if(code!=0x00)
+		{
+		 printf("%08x\r\n",code);
+			
+		}
 	}
   
   /* USER CODE END 3 */

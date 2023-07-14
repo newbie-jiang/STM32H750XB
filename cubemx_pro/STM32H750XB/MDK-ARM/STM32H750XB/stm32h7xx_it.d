@@ -40,6 +40,7 @@ stm32h750xb\stm32h7xx_it.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_ti
 stm32h750xb\stm32h7xx_it.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h
 stm32h750xb\stm32h7xx_it.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
 stm32h750xb\stm32h7xx_it.o: ../Core/Inc/stm32h7xx_it.h
+stm32h750xb\stm32h7xx_it.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdio.h
 stm32h750xb\stm32h7xx_it.o: ../BSP/bsp.h
 stm32h750xb\stm32h7xx_it.o: ../APPlication/app.h
-stm32h750xb\stm32h7xx_it.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdio.h
+stm32h750xb\stm32h7xx_it.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdbool.h

@@ -65,6 +65,9 @@ void Error_Handler(void);
 #define LED_B_GPIO_Port GPIOI
 #define UART4_TX_Pin GPIO_PIN_0
 #define UART4_TX_GPIO_Port GPIOA
+#define IRDA_Pin GPIO_PIN_3
+#define IRDA_GPIO_Port GPIOH
+#define IRDA_EXTI_IRQn EXTI3_IRQn
 #define USER_KEY_Pin GPIO_PIN_4
 #define USER_KEY_GPIO_Port GPIOH
 #define USER_KEY_EXTI_IRQn EXTI4_IRQn

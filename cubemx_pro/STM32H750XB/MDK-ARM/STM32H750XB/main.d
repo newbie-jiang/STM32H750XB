@@ -40,6 +40,7 @@ stm32h750xb\main.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h
 stm32h750xb\main.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h
 stm32h750xb\main.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
 stm32h750xb\main.o: ../Core/Inc/adc.h
+stm32h750xb\main.o: ../Core/Inc/tim.h
 stm32h750xb\main.o: ../Core/Inc/usart.h
 stm32h750xb\main.o: ../Core/Inc/gpio.h
 stm32h750xb\main.o: ../BSP/bsp.h
