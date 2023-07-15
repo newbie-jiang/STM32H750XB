@@ -152,6 +152,7 @@ int main(void)
 		uint32_t code=scan_irda();
 		if(code!=0x00)
 		{
+		
 		 printf("%08x\r\n",code);
 			
 		}

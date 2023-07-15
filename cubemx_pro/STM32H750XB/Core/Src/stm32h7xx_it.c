@@ -246,15 +246,27 @@ void EXTI4_IRQHandler(void)
 void TIM6_DAC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-	
+	static int tick_num=0; 
+	static int num;
 	/*uint16_t  0-65535*/
 	irda_count++; /*10us一次*/
+	
+	/*避免一直产生中断,红外触发1s后关闭中断*/
+	if(irda_count==10000) //可能计数10000判断会跳过，不需要太精确影响不大
+	{
+		tick_num++; /*100ms累加一次*/
+	 /*关闭定时器*/
+	 if(tick_num>=10) /*1s关闭定时器*/
+	 HAL_TIM_Base_Stop(&htim6);	
+	
+	}
+	/****************************************/
 
-// static int num;
-//	
-//	num++;
-//	if(num)
-//	HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
+
+	
+	num++;
+	if(num)
+	HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
   /* USER CODE END TIM6_DAC_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
@@ -358,7 +370,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		 //LED_R_ON;
 		
 		 /*开启定时器计数*/
-		 //HAL_TIM_Base_Start_IT(&htim6);
+		 HAL_TIM_Base_Start_IT(&htim6);
 		 /*关闭定时器计数*/
 		 //HAL_TIM_Base_Stop(&htim6);
 		
@@ -423,7 +435,7 @@ uint32_t scan_irda(void)
 			if((think_tim>=START_MIN&&think_tim<=START_MAX))
 					irda_state=1; /*引导码正确进入下一阶段*/
 			else 
-				
+				//HAL_TIM_Base_Stop(&htim6);
 			 break; /*非引导码直接跳出*/
 	  
 		case 1:
@@ -440,12 +452,12 @@ uint32_t scan_irda(void)
 			  irda_decoder|=1<<(irda_data_bit_count-1);
 				irda_data_bit_count-=1;
 				irda_state=2;
-				
 			}
 			
 			else /*非0和1*/
 			{
 			 irda_state=0; /*重新判断引导码*/
+			
 			}
 			
 			
@@ -457,21 +469,21 @@ uint32_t scan_irda(void)
 		  code_flag=1; /*解码完成解码标志位置1*/
 		  irda_data_bit_count=32; /*重新设置32bit数据*/
 		  irda_state=0; /*重新判断引导码*/
-		
-		}
-		else
+	  }
+	 else
 			irda_state=1; /*继续判断0和1*/
 		  	
 	
 	}
 	
-	
+	 
 	 isValueChanged=false;/*恢复中断标志位*/
+	
 	}
 	
 	if(code_flag==1)
 	{
-	 
+	  
 	  get_ir_code=irda_decoder;
     code_flag=0;	
 		irda_decoder=0;	

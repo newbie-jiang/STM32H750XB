@@ -5,7 +5,6 @@ DEL /F/S/Q *.map
 DEL /F/S/Q *.lst
 
 DEL /F/S/Q *.o
-DEL /F/S/Q *.axf
 DEL /F/S/Q *.Bak
 DEL /F/S/Q *.crf
 DEL /F/S/Q *.d
