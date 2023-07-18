@@ -35,7 +35,7 @@
  int buzzer_flag;
  
  uint16_t irda_count=0; /*0-65535*/
-
+ uint16_t tick_us_count;
  
  bool isValueChanged = false;  // 标记变量是否改变
  
@@ -248,6 +248,7 @@ void TIM6_DAC_IRQHandler(void)
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
 	static int tick_num=0; 
 	static int num;
+
 	/*uint16_t  0-65535*/
 	irda_count++; /*10us一次*/
 	
@@ -262,11 +263,9 @@ void TIM6_DAC_IRQHandler(void)
 	}
 	/****************************************/
 
-
-	
-	num++;
-	if(num)
-	HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
+//	num++;
+//	if(num)
+//	HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
   /* USER CODE END TIM6_DAC_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
@@ -390,7 +389,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 1:       低电平0.56ms   高电平1.68ms     2.24ms
 ********************************************************************************************/
 /**********************根据定时器计数可调（可调参数）***************************************/
-#define   TIM_INTERRUPT_TIME        10                    /* 计一次数时间(us)*/
+#define   TIM_INTERRUPT_TIME        1                     /* 计一次数时间(us)*/
 #define   OVERFLOW                  65535                 /* 溢出值 (变量类型相关这里无符号16位) */
 /******************NEC协议解码(适用于NEC协议，非必要勿改（可动态增加范围）)***********************/
 #define   START_MIN               13000/TIM_INTERRUPT_TIME    /* 引导码最小计数次数 */

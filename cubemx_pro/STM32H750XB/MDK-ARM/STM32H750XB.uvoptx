@@ -152,66 +152,66 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>607</LineNumber>
+          <LineNumber>127</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235420</Address>
+          <Address>134235872</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Core/Src/stm32h7xx_it.c</Filename>
+          <Filename>../Core/Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32H750XB\../Core/Src/stm32h7xx_it.c\607</Expression>
+          <Expression>\\STM32H750XB\../Core/Src/main.c\127</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>530</LineNumber>
+          <LineNumber>135</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235286</Address>
+          <Address>134235878</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Core/Src/stm32h7xx_it.c</Filename>
+          <Filename>../Core/Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32H750XB\../Core/Src/stm32h7xx_it.c\530</Expression>
+          <Expression>\\STM32H750XB\../Core/Src/main.c\135</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>552</LineNumber>
+          <LineNumber>20</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235344</Address>
+          <Address>134236186</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Core/Src/stm32h7xx_it.c</Filename>
+          <Filename>..\BSP\PAJ7620U2_\paj7620u2.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32H750XB\../Core/Src/stm32h7xx_it.c\552</Expression>
+          <Expression>\\STM32H750XB\../BSP/PAJ7620U2_/paj7620u2.c\20</Expression>
         </Bp>
         <Bp>
           <Number>3</Number>
           <Type>0</Type>
-          <LineNumber>561</LineNumber>
+          <LineNumber>269</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235362</Address>
+          <Address>134232560</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Core/Src/stm32h7xx_it.c</Filename>
+          <Filename>../Core/Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32H750XB\../Core/Src/stm32h7xx_it.c\561</Expression>
+          <Expression>\\STM32H750XB\../Core/Src/main.c\269</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -719,8 +719,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\BSP\bsp.c</PathWithFileName>
-      <FilenameWithoutPath>bsp.c</FilenameWithoutPath>
+      <PathWithFileName>..\BSP\PAJ7620U2_\paj7620u2.c</PathWithFileName>
+      <FilenameWithoutPath>paj7620u2.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>34</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\BSP\PAJ7620U2_\paj7620u2_iic.c</PathWithFileName>
+      <FilenameWithoutPath>paj7620u2_iic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -734,7 +746,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>34</FileNumber>
+      <FileNumber>35</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>

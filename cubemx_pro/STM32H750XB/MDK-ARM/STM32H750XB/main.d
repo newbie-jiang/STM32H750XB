@@ -46,3 +46,7 @@ stm32h750xb\main.o: ../Core/Inc/gpio.h
 stm32h750xb\main.o: ../BSP/bsp.h
 stm32h750xb\main.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdio.h
 stm32h750xb\main.o: ../Core/Inc/stm32h7xx_it.h
+stm32h750xb\main.o: ../BSP/PAJ7620U2_/PAJ7620U2.h
+stm32h750xb\main.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\string.h
+stm32h750xb\main.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdlib.h
+stm32h750xb\main.o: ../BSP/PAJ7620U2_/paj7620u2_iic.h

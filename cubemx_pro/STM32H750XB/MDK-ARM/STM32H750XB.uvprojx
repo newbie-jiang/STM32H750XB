@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H750xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../BSP;../APPlication</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../BSP;../APPlication;../BSP/PAJ7620U2_</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -920,9 +920,14 @@
           <GroupName>BSP</GroupName>
           <Files>
             <File>
-              <FileName>bsp.c</FileName>
+              <FileName>paj7620u2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\BSP\bsp.c</FilePath>
+              <FilePath>..\BSP\PAJ7620U2_\paj7620u2.c</FilePath>
+            </File>
+            <File>
+              <FileName>paj7620u2_iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\PAJ7620U2_\paj7620u2_iic.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -71,8 +71,12 @@ void Error_Handler(void);
 #define USER_KEY_Pin GPIO_PIN_4
 #define USER_KEY_GPIO_Port GPIOH
 #define USER_KEY_EXTI_IRQn EXTI4_IRQn
+#define SCL_PAJ7620_Pin GPIO_PIN_11
+#define SCL_PAJ7620_GPIO_Port GPIOH
 #define PB2_Pin GPIO_PIN_2
 #define PB2_GPIO_Port GPIOB
+#define SDA_PAJ7620_Pin GPIO_PIN_12
+#define SDA_PAJ7620_GPIO_Port GPIOH
 #define BUZZER_Pin GPIO_PIN_0
 #define BUZZER_GPIO_Port GPIOB
 
