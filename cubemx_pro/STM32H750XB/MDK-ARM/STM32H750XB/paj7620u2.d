@@ -46,4 +46,3 @@ stm32h750xb\paj7620u2.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdlib.
 stm32h750xb\paj7620u2.o: ..\BSP\PAJ7620U2_\paj7620u2_iic.h
 stm32h750xb\paj7620u2.o: ../Core/Inc/gpio.h
 stm32h750xb\paj7620u2.o: ..\BSP\PAJ7620U2_\paj7620u2_cfg.h
-stm32h750xb\paj7620u2.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdio.h

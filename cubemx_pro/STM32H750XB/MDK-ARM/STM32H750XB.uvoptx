@@ -184,22 +184,6 @@
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>20</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134236186</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\BSP\PAJ7620U2_\paj7620u2.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32H750XB\../BSP/PAJ7620U2_/paj7620u2.c\20</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
           <LineNumber>269</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>134232560</Address>

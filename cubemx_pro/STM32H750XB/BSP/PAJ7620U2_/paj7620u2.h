@@ -23,7 +23,10 @@ typedef enum{
 	BANK1,     //BANK1寄存器
 }bank_e;
 
-#define PAJ7620_ID           0x73<<1 //设备地址
+
+
+#define PAJ7620_ID           0x73<<1 //设备地址0X73
+    
 
 #define PAJ_REGITER_BANK_SEL 0XEF    //BANK选择寄存器
 #define PAJ_BANK0            0X00    //BANK0
@@ -78,7 +81,7 @@ typedef struct GESTURE_DATA
 	uint16_t  	type;
 }GestureData;
 
-extern GestureData *gesture;	//全局结构体指针 gesture，动态存储手势传感数据
+extern GestureData *gesture;	//全局结构体指针 gesture，存储手势传感数据
 extern GestureData *Gesture_B;	//全局结构体指针 gesture，动态存储手势传感数据
 
 uint8_t paj7620u2_init(void);

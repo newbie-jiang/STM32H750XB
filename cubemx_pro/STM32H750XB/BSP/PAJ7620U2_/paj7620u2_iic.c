@@ -247,10 +247,8 @@ uint8_t GS_Read_nByte(uint8_t REG_Address,uint16_t len,uint8_t *buf)
 //PAJ7620唤醒
 void GS_WakeUp()
 {
-	//printf("test3\r\n");
 	GS_IIC_Start();
 	GS_IIC_Send_Byte(PAJ7620_ID);//发写命令
-	//printf("test4\r\n");
 	GS_IIC_Stop();//释放总线
 }
 

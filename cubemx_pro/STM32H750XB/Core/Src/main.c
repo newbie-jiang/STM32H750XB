@@ -173,16 +173,17 @@ int main(void)
 				switch(gesture->type)
 				{
 					case GES_UP:               printf("Up\r\n");            gesture->valid=1;      break; //向上
-					case GES_DOWN:             printf("Down\r\n");          gesture->valid=1;     break; //向下
-					case GES_LEFT:            printf("Left\r\n");          gesture->valid=1;    break; //向左
-					case GES_RIGHT:          	printf("Right\r\n");         gesture->valid=1;    break; //向右
-					case GES_FORWARD:       	printf("Forward\r\n");       gesture->valid=1;   break; //向前
-					case GES_BACKWARD:      		printf("Backward\r\n");      gesture->valid=1;   break; //向后
-					case GES_CLOCKWISE:     		printf("Clockwise\r\n");     gesture->valid=1;   break; //顺时针
-					case GES_ANTI_CLOCKWISE:  printf("AntiClockwise\r\n"); gesture->valid=1;    break; //逆时针
-					case GES_WAVE:           printf("Wave\r\n");     gesture->valid=1;    break; //挥动
-					default:  																				gesture->valid=0;   break;	
+					case GES_DOWN:             printf("Down\r\n");          gesture->valid=1;      break; //向下
+					case GES_LEFT:             printf("Left\r\n");          gesture->valid=1;      break; //向左
+					case GES_RIGHT:          	 printf("Right\r\n");         gesture->valid=1;      break; //向右
+					case GES_FORWARD:       	 printf("Forward\r\n");       gesture->valid=1;      break; //向前
+					case GES_BACKWARD:      	 printf("Backward\r\n");      gesture->valid=1;      break; //向后
+					case GES_CLOCKWISE:     	 printf("Clockwise\r\n");     gesture->valid=1;      break; //顺时针
+					case GES_ANTI_CLOCKWISE:   printf("AntiClockwise\r\n"); gesture->valid=1;      break; //逆时针
+					case GES_WAVE:             printf("Wave\r\n");          gesture->valid=1;      break; //挥动
+					default:  																				      gesture->valid=0;      break;	
 				}
+				
 			}
 		}
   
