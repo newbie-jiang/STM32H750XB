@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -30,6 +31,8 @@
 #include "stm32h7xx_it.h"
 #include "PAJ7620U2.h"	//PAJ7620
 #include "PAJ7620U2_iic.h"	//PAJ7620
+#include "stm32_u8g2.h"
+#include "test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -120,6 +123,8 @@ int main(void)
   MX_UART4_Init();
   MX_ADC3_Init();
   MX_TIM6_Init();
+  MX_I2C1_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   //点亮
 	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
@@ -131,7 +136,10 @@ int main(void)
 
 	    HAL_TIM_Base_Start_IT(&htim6);
 	    printf("STM32H750XB !!!\r\n");	
-	    PAJ7620_Init();
+	    //PAJ7620_Init();
+			
+			 u8g2_t u8g2;
+   u8g2Init(&u8g2);	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -161,31 +169,31 @@ int main(void)
 //		 printf("%08x\r\n",code);
 //			
 //		}
-   HAL_Delay(200);
+  // HAL_Delay(200);
 
 	//手势识别
-		gesture->detect = GS_Read_nByte(PAJ_GET_INT_FLAG1,2,&gesture->data[0]);//读取手势状态			
-		if(!gesture->detect)
-		{   
-			gesture->type =(uint16_t)gesture->data[1]<<8 | gesture->data[0];
-			if(gesture->type) 
-			{
-				switch(gesture->type)
-				{
-					case GES_UP:               printf("Up\r\n");            gesture->valid=1;      break; //向上
-					case GES_DOWN:             printf("Down\r\n");          gesture->valid=1;      break; //向下
-					case GES_LEFT:             printf("Left\r\n");          gesture->valid=1;      break; //向左
-					case GES_RIGHT:          	 printf("Right\r\n");         gesture->valid=1;      break; //向右
-					case GES_FORWARD:       	 printf("Forward\r\n");       gesture->valid=1;      break; //向前
-					case GES_BACKWARD:      	 printf("Backward\r\n");      gesture->valid=1;      break; //向后
-					case GES_CLOCKWISE:     	 printf("Clockwise\r\n");     gesture->valid=1;      break; //顺时针
-					case GES_ANTI_CLOCKWISE:   printf("AntiClockwise\r\n"); gesture->valid=1;      break; //逆时针
-					case GES_WAVE:             printf("Wave\r\n");          gesture->valid=1;      break; //挥动
-					default:  																				      gesture->valid=0;      break;	
-				}
-				
-			}
-		}
+//		gesture->detect = GS_Read_nByte(PAJ_GET_INT_FLAG1,2,&gesture->data[0]);//读取手势状态			
+//		if(!gesture->detect)
+//		{   
+//			gesture->type =(uint16_t)gesture->data[1]<<8 | gesture->data[0];
+//			if(gesture->type) 
+//			{
+//				switch(gesture->type)
+//				{
+//					case GES_UP:               printf("Up\r\n");            gesture->valid=1;      break; //向上
+//					case GES_DOWN:             printf("Down\r\n");          gesture->valid=1;      break; //向下
+//					case GES_LEFT:             printf("Left\r\n");          gesture->valid=1;      break; //向左
+//					case GES_RIGHT:          	 printf("Right\r\n");         gesture->valid=1;      break; //向右
+//					case GES_FORWARD:       	 printf("Forward\r\n");       gesture->valid=1;      break; //向前
+//					case GES_BACKWARD:      	 printf("Backward\r\n");      gesture->valid=1;      break; //向后
+//					case GES_CLOCKWISE:     	 printf("Clockwise\r\n");     gesture->valid=1;      break; //顺时针
+//					case GES_ANTI_CLOCKWISE:   printf("AntiClockwise\r\n"); gesture->valid=1;      break; //逆时针
+//					case GES_WAVE:             printf("Wave\r\n");          gesture->valid=1;      break; //挥动
+//					default:  																				      gesture->valid=0;      break;	
+//				}
+//				
+//			}
+//		}
   
 	
 //    delay_us(5);
@@ -194,6 +202,16 @@ int main(void)
 //	  delay_us(5);
 //   
 //   HAL_GPIO_WritePin(PB2_GPIO_Port, PB2_Pin,0);
+
+
+      u8g2_FirstPage(&u8g2);
+       do
+       {
+				 draw(&u8g2);
+
+				 u8g2DrawTest(&u8g2);
+       } while (u8g2_NextPage(&u8g2));
+
 	}
   
   /* USER CODE END 3 */

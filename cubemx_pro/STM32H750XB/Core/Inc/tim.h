@@ -29,8 +29,11 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#define DLY_TIM_Handle (&htim1)	
+void Tims_delay_us(uint16_t nus);
 /* USER CODE END Includes */
+
+extern TIM_HandleTypeDef htim1;
 
 extern TIM_HandleTypeDef htim6;
 
@@ -38,6 +41,7 @@ extern TIM_HandleTypeDef htim6;
 
 /* USER CODE END Private defines */
 
+void MX_TIM1_Init(void);
 void MX_TIM6_Init(void);
 
 /* USER CODE BEGIN Prototypes */

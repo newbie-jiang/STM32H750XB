@@ -247,7 +247,7 @@ void TIM6_DAC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
 	static int tick_num=0; 
-	static int num;
+//	static int num;
 
 	/*uint16_t  0-65535*/
 	irda_count++; /*10us“ª¥Œ*/

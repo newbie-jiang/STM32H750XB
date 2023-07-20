@@ -40,6 +40,7 @@ stm32h750xb\main.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h
 stm32h750xb\main.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h
 stm32h750xb\main.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
 stm32h750xb\main.o: ../Core/Inc/adc.h
+stm32h750xb\main.o: ../Core/Inc/i2c.h
 stm32h750xb\main.o: ../Core/Inc/tim.h
 stm32h750xb\main.o: ../Core/Inc/usart.h
 stm32h750xb\main.o: ../Core/Inc/gpio.h
@@ -50,3 +51,9 @@ stm32h750xb\main.o: ../BSP/PAJ7620U2_/PAJ7620U2.h
 stm32h750xb\main.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\string.h
 stm32h750xb\main.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 stm32h750xb\main.o: ../BSP/PAJ7620U2_/paj7620u2_iic.h
+stm32h750xb\main.o: ../BSP/OLED/stm32_u8g2.h
+stm32h750xb\main.o: ../BSP/OLED/u8g2/csrc/u8g2.h
+stm32h750xb\main.o: ../BSP/OLED/u8g2/csrc/u8x8.h
+stm32h750xb\main.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\stdarg.h
+stm32h750xb\main.o: D:\software_work\keil5\ARM\ARMCC\Bin\..\include\limits.h
+stm32h750xb\main.o: ../BSP/OLED/test.h
