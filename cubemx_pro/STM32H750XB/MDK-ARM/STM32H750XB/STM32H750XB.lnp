@@ -37,6 +37,7 @@
 "stm32h750xb\oled.o"
 "stm32h750xb\stm32_u8g2.o"
 "stm32h750xb\test.o"
+"stm32h750xb\dht11.o"
 "stm32h750xb\app.o"
 "stm32h750xb\mui.o"
 "stm32h750xb\mui_u8g2.o"

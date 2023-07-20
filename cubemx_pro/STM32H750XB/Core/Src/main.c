@@ -33,6 +33,7 @@
 #include "PAJ7620U2_iic.h"	//PAJ7620
 #include "stm32_u8g2.h"
 #include "test.h"
+#include "dht11.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -99,7 +100,9 @@ float readInternalVoltage(void)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  uint8_t t;
+  uint8_t temperature;  	    
+	uint8_t humidity; 
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -135,13 +138,15 @@ int main(void)
 
 
 	    HAL_TIM_Base_Start_IT(&htim6);
+			
+			
 	    printf("STM32H750XB !!!\r\n");	
 	    //PAJ7620_Init();
-			
-			 u8g2_t u8g2;
-   u8g2Init(&u8g2);	
+			DHT11_Init();
+			 //u8g2_t u8g2;
+   //u8g2Init(&u8g2);	
   /* USER CODE END 2 */
-
+     HAL_Delay(1000);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -204,13 +209,30 @@ int main(void)
 //   HAL_GPIO_WritePin(PB2_GPIO_Port, PB2_Pin,0);
 
 
-      u8g2_FirstPage(&u8g2);
-       do
-       {
-				 draw(&u8g2);
+//      u8g2_FirstPage(&u8g2);
+//       do
+//       {
+//				 draw(&u8g2);
 
-				 u8g2DrawTest(&u8g2);
-       } while (u8g2_NextPage(&u8g2));
+//				 u8g2DrawTest(&u8g2);
+//       } while (u8g2_NextPage(&u8g2));
+
+
+  
+
+
+
+	if(t%20==0)
+		{          
+			DHT11_Read_Data(&temperature,&humidity);	
+      printf("Tem:%d\r\n",temperature);
+			printf("Hum:%d\r\n",humidity);	
+			printf("\r\n\n");
+		
+		}				   
+	 	HAL_Delay(100);
+		
+		t++;  
 
 	}
   

@@ -77,6 +77,8 @@ void Error_Handler(void);
 #define PB2_GPIO_Port GPIOB
 #define SDA_PAJ7620_Pin GPIO_PIN_12
 #define SDA_PAJ7620_GPIO_Port GPIOH
+#define DHT11_Pin GPIO_PIN_1
+#define DHT11_GPIO_Port GPIOB
 #define BUZZER_Pin GPIO_PIN_0
 #define BUZZER_GPIO_Port GPIOB
 

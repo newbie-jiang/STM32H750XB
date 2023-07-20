@@ -3,6 +3,10 @@
 #include "i2c.h"
 
 
+
+
+
+
 uint8_t u8x8_byte_hw_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
     /* u8g2/u8x8 will never send more than 32 bytes between START_TRANSFER and END_TRANSFER */
@@ -109,7 +113,7 @@ void u8g2Init(u8g2_t *u8g2)
 
 void draw(u8g2_t *u8g2)
 {
-	u8g2_ClearBuffer(u8g2); 
+	  u8g2_ClearBuffer(u8g2); 
 	
     u8g2_SetFontMode(u8g2, 1); /*字体模式选择*/
     u8g2_SetFontDirection(u8g2, 0); /*字体方向选择*/
@@ -136,6 +140,9 @@ void draw(u8g2_t *u8g2)
 	u8g2_SendBuffer(u8g2);
 	HAL_Delay(1000);
 }
+
+
+
 
 //画点填充
 void testDrawPixelToFillScreen(u8g2_t *u8g2)
