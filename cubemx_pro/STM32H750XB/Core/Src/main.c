@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "fatfs.h"
 #include "i2c.h"
 #include "sdmmc.h"
 #include "tim.h"
@@ -45,7 +46,16 @@ void  PAJ7620_Init(void);
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+/*******************************fatfs*************************************/
+//FATFS fs;                 // Work area (file system object) for logical drive
+//FIL fil;                  // file objects
+//uint32_t byteswritten;                /* File write counts */
+//uint32_t bytesread;                   /* File read counts */
+//uint8_t wtext[] = "This is STM32H750XB working with FatFs"; /* File write buffer */
+//uint8_t rtext[100];                     /* File read buffers */
+//char filename[] = "0:/mytest_2023_07_27.txt";
 
+/**************************************************************************/
 
 /* USER CODE END PD */
 
@@ -135,6 +145,7 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM1_Init();
   MX_SDMMC1_SD_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   //µãÁÁ
 	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//Ð£×¼ADC
@@ -149,15 +160,20 @@ int main(void)
 			
 	    printf("STM32H750XB !!!\r\n");	
 	    //PAJ7620_Init();
-			DHT11_Init();
+			//DHT11_Init();
 			 //u8g2_t u8g2;
    //u8g2Init(&u8g2);
-	 get_sd_informatization();
-	 HAL_Delay(200);
-	 SD_EraseTest();
-	 SD_Write_Read_Test();
+//	 get_sd_informatization();
+//	 HAL_Delay(200);
+//	 SD_EraseTest();
+//	 SD_Write_Read_Test();
 	 
 	 
+
+	 
+	 
+	 
+	  fatfs_test();
 	 
 	 
   /* USER CODE END 2 */

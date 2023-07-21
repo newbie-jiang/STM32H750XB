@@ -3,6 +3,20 @@
 #include "stdio.h" 
 #include "sdmmc.h" 
 #include "string.h" 
+#include "fatfs.h"
+
+///*******************************fatfs*************************************/
+FATFS fs;                 // Work area (file system object) for logical drive
+FIL fil;                  // file objects
+uint32_t byteswritten;                /* File write counts */
+uint32_t bytesread;                   /* File read counts */
+uint8_t wtext[] = "This is STM32H750XB working with FatFs"; /* File write buffer */
+uint8_t rtext[100];                     /* File read buffers */
+char filename[] = "0:/mytest_2023_07_21.txt";
+
+///**************************************************************************/
+
+
 
 
 typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
@@ -26,197 +40,6 @@ TestStatus eBuffercmp(uint32_t* pBuffer, uint32_t BufferLength);
 
 void SD_EraseTest(void);
 void SD_Write_Read_Test(void);
-
-
-
-void sd_test(void)
-{
-	
-   HAL_SD_CardInfoTypeDef  SDCardInfo;         //SD卡信息结构体
-   printf("Micro SD Card Test...\r\n");
-  /* 检测SD卡是否正常（处于数据传输模式的传输状态） */
-  if(HAL_SD_GetCardState(&hsd1) == HAL_SD_CARD_TRANSFER)
-  {      
-    printf("Initialize SD card successfully!\r\n");
-    // 打印SD卡基本信息
-    printf(" SD card information! \r\n");
-		/*实际存储容量 = LogBlockNbr * LogBlockSize*/
-		printf(" LogBlockNbr   : %d \r\n", hsd1.SdCard.LogBlockNbr);	// 逻辑块数量
-	  printf(" LogBlockSize  : %d \r\n", hsd1.SdCard.LogBlockSize); // 逻辑块大小(字节)
-    printf(" Card Log Capacity  : %llu byte\r\n", (unsigned long long)hsd1.SdCard.BlockSize * hsd1.SdCard.BlockNbr);// 显示容量(字节)
-		printf(" Card Log Capacity  : %llu M\r\n", ((unsigned long long)hsd1.SdCard.BlockSize * hsd1.SdCard.BlockNbr)/(1024*1024));// 显示容量(M)
-		printf(" CardBlockNbr  : %d \r\n", hsd1.SdCard.BlockNbr);   // 物理块数量
-    printf(" CardBlockSize : %d \r\n", hsd1.SdCard.BlockSize);   // 物理块大小
-		printf(" Card physical Capacity  : %llu M\r\n", ((unsigned long long)hsd1.SdCard.BlockSize * hsd1.SdCard.BlockNbr)/(1024*1024));// 显示容量(字节)
-
-    printf(" RCA           : %d \r\n", hsd1.SdCard.RelCardAdd);  // 卡相对地址
-    printf(" CardType      : %d \r\n", hsd1.SdCard.CardType);    // 卡类型
-    // 读取并打印SD卡的CID信息
-    HAL_SD_CardCIDTypeDef sdcard_cid;
-    HAL_SD_GetCardCID(&hsd1,&sdcard_cid);
-    printf(" ManufacturerID: %d \r\n",sdcard_cid.ManufacturerID); /*获取sd卡制造商*/
-  }
-  else
-  {
-    printf("SD card init fail!\r\n" );
-  }
- 
- 
-			printf("Micro SD Card Test... \r\n");
-		
-		uint8_t read_buf[512];		// 读数据缓存
-		uint8_t write_buf[512];		// 写数据缓存
-
-		/* SD卡状态 */
-		int sdcard_status = 0;
-		
-		
-		
-		/* 读取未操作之前的数据 */
-		printf("------------------- Read SD card block data Test ------------------\r\n");
-		/*
-			读一个扇区的数据：
-			0: 从第0个扇区开始。
-			1：读一个扇区的数据。
-			0xffff：等待时间。
-			note：也就是只读了第0个扇区。
-		*/
-		
-		
-		/******************************擦除块**************************************/
-		sdcard_status = HAL_SD_Erase(&hsd1, 0, 2);/*擦除  0-2  块*/
-		// 等待擦除完毕
-		if (sdcard_status == HAL_OK)
-		{	
-			printf("Erasing block. state = %d \r\n", HAL_SD_GetCardState(&hsd1));
-			while (HAL_SD_GetCardState(&hsd1) == HAL_SD_CARD_PROGRAMMING);
-			printf("Erase block ok state = %d \r\n", HAL_SD_GetCardState(&hsd1));
-		}
-		else
-		{
-			printf("Erase block fail! status = %d \r\n", sdcard_status);
-		}
-		
-		
-		
-		
-		
-		/***************************************************************************/
-		
-		sdcard_status = HAL_SD_ReadBlocks(&hsd1, (uint8_t *)read_buf, 0, 1, 0xffff);
-		if(sdcard_status == HAL_OK)
-		{ 
-			printf("Read block data ok! \r\n");
-			for(int i = 0; i < 512; i++)
-			{
-				printf("0x%02x ", read_buf[i]);
-				if((i+1)%16 == 0)
-				{
-					printf("\r\n");
-				}
-			}
-		}
-		else
-		{
-			printf("Read block data fail! status = %d \r\n", sdcard_status);
-		}
-		
-
-		/* 向SD卡块写入数据 */
-		printf("------------------- Write SD card block data Test ------------------\r\n");
-		/* 填充缓冲区数据 */
-		for(int i = 0; i < 512; i++)
-		{
-			write_buf[i] = i % 256;
-		}
-		// 开始写入数据
-		/*
-			写一个扇区的数据：
-			0: 从第0个扇区开始。
-			1：写一个扇区的数据。
-			0xffff：等待时间。
-			note：也就是只写了第0个扇区。
-		*/
-		sdcard_status = HAL_SD_WriteBlocks(&hsd1, (uint8_t *)write_buf, 0, 1, 0xffff);
-		if(sdcard_status == HAL_OK)
-		{ 
-			/* 传输完成不代表写入完成，因此要等待SD卡状态变为可传输状态。擦除操作也是一样。 */
-			printf("Writing block data. state = %d \r\n", HAL_SD_GetCardState(&hsd1));
-			while (HAL_SD_GetCardState(&hsd1) == HAL_SD_CARD_PROGRAMMING);
-			printf("Write block data ok，state = %d \r\n", HAL_SD_GetCardState(&hsd1));
-		}
-		else
-		{
-			printf("Write block data fail! status = %d \r\n", sdcard_status);
-		}
-		
-		/* 读取写入之后的数据 */
-		printf("------------------- Read SD card block data after Write ------------------\r\n");
-		sdcard_status = HAL_SD_ReadBlocks(&hsd1, (uint8_t *)read_buf, 0, 1, 0xffff);
-		if(sdcard_status == HAL_OK)
-		{ 
-			printf("Read block data ok! \r\n");
-			for(int i = 0; i < 512; i++)
-			{
-				printf("0x%02x ", read_buf[i]);
-				if((i+1)%16 == 0)
-				{
-					printf("\r\n");
-				}
-			}
-		}
-		else
-		{
-			printf("Read block data fail! status = %d \r\n", sdcard_status);
-		}
-		
-		/* 擦除SD卡块 */
-		printf("------------------- Block Erase -------------------------------\r\n");
-		/*
-			擦除512个扇区的数据：
-			0: 从第0个扇区开始。
-			1：一直擦除到512扇区。
-			note：擦除第0到第512个扇区数据，也包括0和512，也就是一共512个。
-		*/
-		sdcard_status = HAL_SD_Erase(&hsd1, 0, 512);
-		// 等待擦除完毕
-		if (sdcard_status == HAL_OK)
-		{	
-			printf("Erasing block. state = %d \r\n", HAL_SD_GetCardState(&hsd1));
-			while (HAL_SD_GetCardState(&hsd1) == HAL_SD_CARD_PROGRAMMING);
-			printf("Erase block ok state = %d \r\n", HAL_SD_GetCardState(&hsd1));
-		}
-		else
-		{
-			printf("Erase block fail! status = %d \r\n", sdcard_status);
-		}
-		
-		/* 读取擦除之后的数据 */
-		printf("------------------- Read SD card block data after Erase ------------------\r\n");
-		sdcard_status = HAL_SD_ReadBlocks(&hsd1, (uint8_t *)read_buf, 0, 1, 0xffff);
-		if(sdcard_status == HAL_OK)
-		{ 
-			printf("Read block data ok \r\n" );
-			for(int i = 0; i < 512; i++)
-			{
-				printf("0x%02x ", read_buf[i]);
-				if((i+1)%16 == 0)
-				{
-					printf("\r\n");
-				}
-			}
-		}
-		else
-		{
-			printf("Read block data fail! status = %d \r\n", sdcard_status);
-		}
-
-		printf("------------------- Over ------------------\r\n"); 
-
-}
-
-
-
 
 
 
@@ -394,6 +217,68 @@ TestStatus eBuffercmp(uint32_t* pBuffer, uint32_t BufferLength)
     pBuffer++;
   }
   return PASSED;
+}
+
+
+
+
+void fatfs_test(void)
+{
+
+printf("\r\n ****** FatFs Example ******\r\n\r\n");
+    /*##-1- Register the file system object to the FatFs module ##############*/
+	//f_mkfs("1:",FM_ANY,0,fatbuf,FF_MAX_SS);
+	retSD = f_mount(&fs, SDPath, 1);
+	if(retSD)
+	{
+			printf(" mount error : %d \r\n",retSD);
+			Error_Handler();
+	}
+	else
+			printf(" mount sucess!!! \r\n");
+	/*##-2- Create and Open new text file objects with write access ######*/
+	retSD = f_open(&fil, filename, FA_CREATE_NEW | FA_WRITE);
+	if(retSD)
+			printf(" open file error : %d\r\n",retSD);
+	else
+			printf(" open file sucess!!! \r\n");
+	/*##-3- Write data to the text files ###############################*/
+	retSD = f_write(&fil, wtext, sizeof(wtext), (void *)&byteswritten);
+	if(retSD)
+			printf(" write file error : %d\r\n",retSD);
+	else
+	{
+			printf(" write file sucess!!! \r\n");
+			printf(" write Data : %s\r\n",wtext);
+	}
+	/*##-4- Close the open text files ################################*/
+	retSD = f_close(&fil);
+	if(retSD)
+			printf(" close error : %d\r\n",retSD);
+	else
+			printf(" close sucess!!! \r\n");
+	/*##-5- Open the text files object with read access ##############*/
+	retSD = f_open(&fil, filename, FA_READ);
+	if(retSD)
+			printf(" open file error : %d\r\n",retSD);
+	else
+			printf(" open file sucess!!! \r\n");
+	/*##-6- Read data from the text files ##########################*/
+	retSD = f_read(&fil, rtext, sizeof(rtext), (UINT*)&bytesread);
+	if(retSD)
+			printf(" read error!!! %d\r\n",retSD);
+	else
+	{
+			printf(" read sucess!!! \r\n");
+			printf(" read Data : %s\r\n",rtext);
+	}
+	/*##-7- Close the open text files ############################*/
+	retSD = f_close(&fil);
+	if(retSD) 
+			printf(" close error!!! %d\r\n",retSD);
+	else
+			printf(" close sucess!!! \r\n");
+
 }
 
 
