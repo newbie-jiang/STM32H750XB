@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "sdmmc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -32,8 +33,9 @@
 #include "PAJ7620U2.h"	//PAJ7620
 #include "PAJ7620U2_iic.h"	//PAJ7620
 #include "stm32_u8g2.h"
-#include "test.h"
+#include "oled_test.h"
 #include "dht11.h"
+#include "sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,6 +62,7 @@ void  PAJ7620_Init(void);
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void PeriphCommonClock_Config(void);
 /* USER CODE BEGIN PFP */
  int numerical_value;
 extern int buzzer_flag;
@@ -117,6 +120,9 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+/* Configure the peripherals common clocks */
+  PeriphCommonClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -128,6 +134,7 @@ int main(void)
   MX_TIM6_Init();
   MX_I2C1_Init();
   MX_TIM1_Init();
+  MX_SDMMC1_SD_Init();
   /* USER CODE BEGIN 2 */
   //µãÁÁ
 	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//Ð£×¼ADC
@@ -144,9 +151,17 @@ int main(void)
 	    //PAJ7620_Init();
 			DHT11_Init();
 			 //u8g2_t u8g2;
-   //u8g2Init(&u8g2);	
+   //u8g2Init(&u8g2);
+	 get_sd_informatization();
+	 HAL_Delay(200);
+	 SD_EraseTest();
+	 SD_Write_Read_Test();
+	 
+	 
+	 
+	 
   /* USER CODE END 2 */
-     HAL_Delay(1000);
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -222,17 +237,17 @@ int main(void)
 
 
 
-	if(t%20==0)
-		{          
-			DHT11_Read_Data(&temperature,&humidity);	
-      printf("Tem:%d\r\n",temperature);
-			printf("Hum:%d\r\n",humidity);	
-			printf("\r\n\n");
-		
-		}				   
-	 	HAL_Delay(100);
-		
-		t++;  
+//	if(t%20==0)
+//		{          
+//			DHT11_Read_Data(&temperature,&humidity);	
+//      printf("Tem:%d\r\n",temperature);
+//			printf("Hum:%d\r\n",humidity);	
+//			printf("\r\n\n");
+//		
+//		}				   
+//	 	HAL_Delay(100);
+//		
+//		t++;  
 
 	}
   
@@ -297,6 +312,33 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief Peripherals Common Clock Configuration
+  * @retval None
+  */
+void PeriphCommonClock_Config(void)
+{
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+  /** Initializes the peripherals clock
+  */
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SDMMC;
+  PeriphClkInitStruct.PLL2.PLL2M = 2;
+  PeriphClkInitStruct.PLL2.PLL2N = 12;
+  PeriphClkInitStruct.PLL2.PLL2P = 4;
+  PeriphClkInitStruct.PLL2.PLL2Q = 2;
+  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOMEDIUM;
+  PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }

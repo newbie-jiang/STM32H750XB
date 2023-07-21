@@ -10,7 +10,7 @@ extern uint16_t  tick_us_count;
 void SDA_IN(void);
 void SDA_OUT(void);
 uint8_t READ_SDA(void);
-void delay_us(uint16_t us);
+//void delay_us(uint16_t us);
 
 
 ///**

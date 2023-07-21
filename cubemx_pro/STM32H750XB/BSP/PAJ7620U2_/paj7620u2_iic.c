@@ -1,12 +1,13 @@
 #include "paj7620u2_iic.h"
 #include "paj7620u2.h"
 #include "stdio.h"
+#include "delay.h"
 
-void delay_us(uint16_t us)
-{
- static unsigned int i=0;
- for ( i=0;i<us*14;++i);
-}
+//void delay_us(uint16_t us)
+//{
+// static unsigned int i=0;
+// for ( i=0;i<us*14;++i);
+//}
 
 
 /**

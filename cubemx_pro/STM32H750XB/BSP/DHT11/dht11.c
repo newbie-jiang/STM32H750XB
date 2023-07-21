@@ -1,7 +1,6 @@
 #include "dht11.h"
-#include "paj7620u2_iic.h"
-
-
+#include "delay.h"
+#include "gpio.h"
 
 void dht11_OUT(void)
 {
