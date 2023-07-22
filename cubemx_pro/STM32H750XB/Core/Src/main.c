@@ -22,6 +22,7 @@
 #include "fatfs.h"
 #include "i2c.h"
 #include "sdmmc.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -39,6 +40,7 @@
 #include "dht11.h"
 #include "sd.h"
 #include "sdram.h"
+#include "w25qxx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,7 +65,7 @@ void  PAJ7620_Init(void);
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-uint16_t testsram[250000] __attribute__((at(0XC0000000)));//测试用数组
+//uint16_t testsram[250000] __attribute__((at(0XC0000000)));//测试用数组
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -78,6 +80,7 @@ void PeriphCommonClock_Config(void);
 /* USER CODE BEGIN PFP */
  int numerical_value;
 extern int buzzer_flag;
+uint8_t ID[2];
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -155,6 +158,7 @@ int main(void)
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
   MX_FMC_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   //点亮
 //	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
@@ -163,16 +167,19 @@ int main(void)
 //	 LED_R_ON;
 //	 LED_B_ON;
 
-    SDRAM_InitSequence();
+    //SDRAM_InitSequence();
 		
 	    //HAL_TIM_Base_Start_IT(&htim6);
 			
 			
-	    printf("STM32H750XB !!!\r\n");	
+	  printf("STM32H750XB !!!\r\n");	
 	    //PAJ7620_Init();
+			
 			//DHT11_Init();
+			
 			//u8g2_t u8g2;
       //u8g2Init(&u8g2);
+			
       //get_sd_informatization();
       //HAL_Delay(200);
       //SD_EraseTest();
@@ -180,10 +187,14 @@ int main(void)
 	
 	    // fatfs_test();
 			
-	  fsmc_sdram_test();
-	 
-	 
-	 
+      //fsmc_sdram_test();
+			
+			
+	   BSP_W25Qx_Init();
+		 /*读取设备制造商id   一般不同大小的设备id不同，可根据返回值判断是哪一个设备*/
+     BSP_W25Qx_Read_ID(ID);
+     printf(" W25Qxxx ID is : 0x%02X 0x%02X \r\n\r\n",ID[0],ID[1]);
+	   w25q128_test();
 	 
   /* USER CODE END 2 */
 
@@ -352,16 +363,18 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SDMMC;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SDMMC
+                              |RCC_PERIPHCLK_SPI1;
   PeriphClkInitStruct.PLL2.PLL2M = 2;
-  PeriphClkInitStruct.PLL2.PLL2N = 12;
+  PeriphClkInitStruct.PLL2.PLL2N = 16;
   PeriphClkInitStruct.PLL2.PLL2P = 4;
   PeriphClkInitStruct.PLL2.PLL2Q = 2;
   PeriphClkInitStruct.PLL2.PLL2R = 2;
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
-  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOMEDIUM;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
   PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
+  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
   PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {

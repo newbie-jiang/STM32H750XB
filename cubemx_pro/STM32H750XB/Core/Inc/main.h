@@ -81,6 +81,8 @@ void Error_Handler(void);
 #define DHT11_GPIO_Port GPIOB
 #define SD_CAP_Pin GPIO_PIN_12
 #define SD_CAP_GPIO_Port GPIOB
+#define SPI1_FLASH_NSS_Pin GPIO_PIN_4
+#define SPI1_FLASH_NSS_GPIO_Port GPIOA
 #define BUZZER_Pin GPIO_PIN_0
 #define BUZZER_GPIO_Port GPIOB
 
