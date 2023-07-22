@@ -63,6 +63,8 @@ void Error_Handler(void);
 #define UART4_RX_GPIO_Port GPIOI
 #define LED_B_Pin GPIO_PIN_8
 #define LED_B_GPIO_Port GPIOI
+#define QSPI_CS_W25Q64_Pin GPIO_PIN_6
+#define QSPI_CS_W25Q64_GPIO_Port GPIOG
 #define UART4_TX_Pin GPIO_PIN_0
 #define UART4_TX_GPIO_Port GPIOA
 #define IRDA_Pin GPIO_PIN_3

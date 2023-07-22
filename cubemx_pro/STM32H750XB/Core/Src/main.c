@@ -21,10 +21,12 @@
 #include "adc.h"
 #include "fatfs.h"
 #include "i2c.h"
+#include "quadspi.h"
 #include "sdmmc.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
+#include "usb_device.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -41,6 +43,9 @@
 #include "sd.h"
 #include "sdram.h"
 #include "w25qxx.h"
+#include "qspi_w25q64.h"
+
+#include "usbd_cdc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -81,6 +86,11 @@ void PeriphCommonClock_Config(void);
  int numerical_value;
 extern int buzzer_flag;
 uint8_t ID[2];
+
+
+uint8_t dat[11] = "mculover666";
+uint8_t read_buf[11] = {0};
+uint8_t UserTxBuffer[] = "usb cdc test!\r\n";
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -159,6 +169,8 @@ int main(void)
   MX_FATFS_Init();
   MX_FMC_Init();
   MX_SPI1_Init();
+  MX_QUADSPI_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
   //点亮
 //	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
@@ -190,11 +202,37 @@ int main(void)
       //fsmc_sdram_test();
 			
 			
-	   BSP_W25Qx_Init();
-		 /*读取设备制造商id   一般不同大小的设备id不同，可根据返回值判断是哪一个设备*/
-     BSP_W25Qx_Read_ID(ID);
-     printf(" W25Qxxx ID is : 0x%02X 0x%02X \r\n\r\n",ID[0],ID[1]);
-	   w25q128_test();
+//	   BSP_W25Qx_Init();
+//		 /*读取设备制造商id   一般不同大小的设备id不同，可根据返回值判断是哪一个设备*/
+//     BSP_W25Qx_Read_ID(ID);
+//     printf(" W25Qxxx ID is : 0x%02X 0x%02X \r\n\r\n",ID[0],ID[1]);
+//	   w25q128_test();
+
+
+//printf("Test W25QXX...\r\n");
+//uint16_t device_id = W25QXX_ReadID();
+//printf("device_id = 0x%04X\r\n\r\n", device_id);
+
+///* 为了验证，首先读取要写入地址处的数据 */
+//printf("-------- read data before write -----------\r\n");
+//W25QXX_Read(read_buf, 5, 11);
+//printf("read date is %s\r\n", (char*)read_buf);
+
+///* 擦除该扇区 */
+//printf("-------- erase sector 0 -----------\r\n");
+//W25QXX_Erase_Sector(0);
+
+///* 写数据 */
+//printf("-------- write data -----------\r\n");
+//W25QXX_Page_Program(dat, 5, 11);
+
+///* 再次读数据 */
+//printf("-------- read data after write -----------\r\n");
+//W25QXX_Read(read_buf, 5, 11);
+//printf("read date is %s\r\n", (char*)read_buf);
+
+
+
 	 
   /* USER CODE END 2 */
 
@@ -285,6 +323,13 @@ int main(void)
 //		
 //		t++;  
 
+
+    USBD_CDC_SetTxBuffer(&hUsbDeviceFS, (uint8_t*)&UserTxBuffer, sizeof(UserTxBuffer));
+
+    USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+
+    HAL_Delay(1000);
+
 	}
   
   /* USER CODE END 3 */
@@ -317,8 +362,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 5;

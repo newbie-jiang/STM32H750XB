@@ -86,7 +86,7 @@ uint8_t BSP_W25Qx_WriteEnable(void)
 	W25Qx_Disable();
 	
 	/* Wait the end of Flash writing */
-	while(BSP_W25Qx_GetStatus() == W25Qx_BUSY);
+	while(BSP_W25Qx_GetStatus() == W25Qx_BUSY)
 	{
 		/* Check for the Timeout */
     if((HAL_GetTick() - tickstart) > W25Qx_TIMEOUT_VALUE)
