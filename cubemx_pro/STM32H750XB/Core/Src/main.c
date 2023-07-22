@@ -25,6 +25,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "fmc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -37,6 +38,7 @@
 #include "oled_test.h"
 #include "dht11.h"
 #include "sd.h"
+#include "sdram.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,7 +63,7 @@ void  PAJ7620_Init(void);
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+uint16_t testsram[250000] __attribute__((at(0XC0000000)));//测试用数组
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -118,6 +120,12 @@ int main(void)
 	uint8_t humidity; 
   /* USER CODE END 1 */
 
+  /* Enable I-Cache---------------------------------------------------------*/
+  SCB_EnableICache();
+
+  /* Enable D-Cache---------------------------------------------------------*/
+  SCB_EnableDCache();
+
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -146,34 +154,35 @@ int main(void)
   MX_TIM1_Init();
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
+  MX_FMC_Init();
   /* USER CODE BEGIN 2 */
   //点亮
-	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
+//	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
 //	HAL_ADCEx_Calibration_Start(&hadc1,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
   
 //	 LED_R_ON;
 //	 LED_B_ON;
 
-
-	    HAL_TIM_Base_Start_IT(&htim6);
+    SDRAM_InitSequence();
+		
+	    //HAL_TIM_Base_Start_IT(&htim6);
 			
 			
 	    printf("STM32H750XB !!!\r\n");	
 	    //PAJ7620_Init();
 			//DHT11_Init();
-			 //u8g2_t u8g2;
-   //u8g2Init(&u8g2);
-//	 get_sd_informatization();
-//	 HAL_Delay(200);
-//	 SD_EraseTest();
-//	 SD_Write_Read_Test();
+			//u8g2_t u8g2;
+      //u8g2Init(&u8g2);
+      //get_sd_informatization();
+      //HAL_Delay(200);
+      //SD_EraseTest();
+      //SD_Write_Read_Test();
+	
+	    // fatfs_test();
+			
+	  fsmc_sdram_test();
 	 
 	 
-
-	 
-	 
-	 
-	  fatfs_test();
 	 
 	 
   /* USER CODE END 2 */
