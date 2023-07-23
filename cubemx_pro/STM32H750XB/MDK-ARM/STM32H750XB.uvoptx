@@ -45,7 +45,7 @@
         <PageWidth>79</PageWidth>
         <PageLength>66</PageLength>
         <TabStop>8</TabStop>
-        <ListingPath></ListingPath>
+        <ListingPath>.\STM32H750XB\</ListingPath>
       </OPTLEX>
       <ListingPage>
         <CreateCListing>1</CreateCListing>
@@ -932,7 +932,7 @@
       <GroupNumber>5</GroupNumber>
       <FileNumber>55</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\BSP\mSD_card\sd.c</PathWithFileName>
@@ -2528,7 +2528,7 @@
       <GroupNumber>11</GroupNumber>
       <FileNumber>184</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>../USB_DEVICE/App/usb_device.c</PathWithFileName>
@@ -2555,8 +2555,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../USB_DEVICE/App/usbd_cdc_if.c</PathWithFileName>
-      <FilenameWithoutPath>usbd_cdc_if.c</FilenameWithoutPath>
+      <PathWithFileName>../USB_DEVICE/App/usbd_storage_if.c</PathWithFileName>
+      <FilenameWithoutPath>usbd_storage_if.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2631,8 +2631,44 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c</PathWithFileName>
-      <FilenameWithoutPath>usbd_cdc.c</FilenameWithoutPath>
+      <PathWithFileName>../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc.c</PathWithFileName>
+      <FilenameWithoutPath>usbd_msc.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>192</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_bot.c</PathWithFileName>
+      <FilenameWithoutPath>usbd_msc_bot.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>193</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_data.c</PathWithFileName>
+      <FilenameWithoutPath>usbd_msc_data.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>194</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Src/usbd_msc_scsi.c</PathWithFileName>
+      <FilenameWithoutPath>usbd_msc_scsi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

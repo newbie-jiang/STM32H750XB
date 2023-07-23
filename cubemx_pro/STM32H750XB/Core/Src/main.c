@@ -45,7 +45,7 @@
 #include "w25qxx.h"
 #include "qspi_w25q64.h"
 
-#include "usbd_cdc.h"
+#include "usbd_storage_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -192,12 +192,14 @@ int main(void)
 			//u8g2_t u8g2;
       //u8g2Init(&u8g2);
 			
-      //get_sd_informatization();
-      //HAL_Delay(200);
-      //SD_EraseTest();
-      //SD_Write_Read_Test();
+//      get_sd_informatization();
+//      HAL_Delay(200);
+//      SD_EraseTest();
+//      SD_Write_Read_Test();
 	
-	    // fatfs_test();
+	     //fatfs_test();
+			 
+			   mount_sd();
 			
       //fsmc_sdram_test();
 			
@@ -324,11 +326,16 @@ int main(void)
 //		t++;  
 
 
-    USBD_CDC_SetTxBuffer(&hUsbDeviceFS, (uint8_t*)&UserTxBuffer, sizeof(UserTxBuffer));
+//    USBD_CDC_SetTxBuffer(&hUsbDeviceFS, (uint8_t*)&UserTxBuffer, sizeof(UserTxBuffer));
 
-    USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+//    USBD_CDC_TransmitPacket(&hUsbDeviceFS);
 
-    HAL_Delay(1000);
+//    HAL_Delay(1000);
+
+
+
+
+
 
 	}
   
@@ -362,9 +369,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 5;
@@ -414,8 +420,8 @@ void PeriphCommonClock_Config(void)
   PeriphClkInitStruct.PLL2.PLL2M = 2;
   PeriphClkInitStruct.PLL2.PLL2N = 16;
   PeriphClkInitStruct.PLL2.PLL2P = 4;
-  PeriphClkInitStruct.PLL2.PLL2Q = 2;
-  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2Q = 1;
+  PeriphClkInitStruct.PLL2.PLL2R = 1;
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;

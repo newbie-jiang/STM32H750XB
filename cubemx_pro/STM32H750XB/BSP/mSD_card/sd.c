@@ -222,6 +222,24 @@ TestStatus eBuffercmp(uint32_t* pBuffer, uint32_t BufferLength)
 
 
 
+
+void mount_sd(void)
+{
+	retSD = f_mount(&fs, SDPath, 1);
+	if(retSD)
+	{
+			printf(" mount error : %d \r\n",retSD);
+			Error_Handler();
+	}
+	else
+			printf(" mount sucess!!! \r\n");
+
+}
+
+
+
+
+
 void fatfs_test(void)
 {
 
