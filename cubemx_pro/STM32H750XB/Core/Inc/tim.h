@@ -45,7 +45,7 @@ void MX_TIM1_Init(void);
 void MX_TIM6_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+void tim_delay_us(TIM_HandleTypeDef *htim, uint32_t us);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

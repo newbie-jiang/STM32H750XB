@@ -59,17 +59,19 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_R_Pin GPIO_PIN_15
 #define LED_R_GPIO_Port GPIOC
+#define WL_HOST_WAKE_Pin GPIO_PIN_3
+#define WL_HOST_WAKE_GPIO_Port GPIOE
+#define WL_HOST_WAKE_EXTI_IRQn EXTI3_IRQn
 #define UART4_RX_Pin GPIO_PIN_9
 #define UART4_RX_GPIO_Port GPIOI
+#define WIFI_REG_ON_Pin GPIO_PIN_13
+#define WIFI_REG_ON_GPIO_Port GPIOC
 #define LED_B_Pin GPIO_PIN_8
 #define LED_B_GPIO_Port GPIOI
 #define QSPI_CS_W25Q64_Pin GPIO_PIN_6
 #define QSPI_CS_W25Q64_GPIO_Port GPIOG
 #define UART4_TX_Pin GPIO_PIN_0
 #define UART4_TX_GPIO_Port GPIOA
-#define IRDA_Pin GPIO_PIN_3
-#define IRDA_GPIO_Port GPIOH
-#define IRDA_EXTI_IRQn EXTI3_IRQn
 #define USER_KEY_Pin GPIO_PIN_4
 #define USER_KEY_GPIO_Port GPIOH
 #define USER_KEY_EXTI_IRQn EXTI4_IRQn

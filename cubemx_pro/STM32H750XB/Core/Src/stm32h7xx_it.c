@@ -68,7 +68,6 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
-extern TIM_HandleTypeDef htim6;
 extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
@@ -221,7 +220,7 @@ void EXTI3_IRQHandler(void)
   /* USER CODE BEGIN EXTI3_IRQn 0 */
 
   /* USER CODE END EXTI3_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(IRDA_Pin);
+  HAL_GPIO_EXTI_IRQHandler(WL_HOST_WAKE_Pin);
   /* USER CODE BEGIN EXTI3_IRQn 1 */
 
   /* USER CODE END EXTI3_IRQn 1 */
@@ -239,39 +238,6 @@ void EXTI4_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_IRQn 1 */
 
   /* USER CODE END EXTI4_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM6 global interrupt, DAC1_CH1 and DAC1_CH2 underrun error interrupts.
-  */
-void TIM6_DAC_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-	static int tick_num=0; 
-//	static int num;
-
-	/*uint16_t  0-65535*/
-	irda_count++; /*10us一次*/
-	
-	/*避免一直产生中断,红外触发1s后关闭中断*/
-	if(irda_count==10000) //可能计数10000判断会跳过，不需要太精确影响不大
-	{
-		tick_num++; /*100ms累加一次*/
-	 /*关闭定时器*/
-	 if(tick_num>=10) /*1s关闭定时器*/
-	 HAL_TIM_Base_Stop(&htim6);	
-	
-	}
-	/****************************************/
-
-//	num++;
-//	if(num)
-//	HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
-  /* USER CODE END TIM6_DAC_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim6);
-  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
-
-  /* USER CODE END TIM6_DAC_IRQn 1 */
 }
 
 /**
@@ -379,20 +345,28 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	 }
 	 
 	 /*红外接收中断*/
-	 if(GPIO_Pin==IRDA_Pin)
-	{
-		 //LED_R_ON;
-		
-		 /*开启定时器计数*/
-		 HAL_TIM_Base_Start_IT(&htim6);
-		 /*关闭定时器计数*/
-		 //HAL_TIM_Base_Stop(&htim6);
-		
-		
-		 isValueChanged=true;
-		
+//	 if(GPIO_Pin==IRDA_Pin)
+//	{
+//		 //LED_R_ON;
+//		
+//		 /*开启定时器计数*/
+//		 HAL_TIM_Base_Start_IT(&htim6);
+//		 /*关闭定时器计数*/
+//		 //HAL_TIM_Base_Stop(&htim6);
+//		
+//		
+//		 isValueChanged=true;
+//		
+//		 
+//	}
+	 
+	 if(GPIO_Pin==WIFI_REG_ON_Pin)
+	 {
+	  /*上升沿wifi唤醒状态*/
 		 
-	}
+		 
+		 
+	 }
 
 
 }

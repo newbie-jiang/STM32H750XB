@@ -124,10 +124,6 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE END TIM6_MspInit 0 */
     /* TIM6 clock enable */
     __HAL_RCC_TIM6_CLK_ENABLE();
-
-    /* TIM6 interrupt Init */
-    HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
   /* USER CODE BEGIN TIM6_MspInit 1 */
 
   /* USER CODE END TIM6_MspInit 1 */
@@ -155,9 +151,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE END TIM6_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_TIM6_CLK_DISABLE();
-
-    /* TIM6 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(TIM6_DAC_IRQn);
   /* USER CODE BEGIN TIM6_MspDeInit 1 */
 
   /* USER CODE END TIM6_MspDeInit 1 */
@@ -174,6 +167,44 @@ void Tims_delay_us(uint16_t nus)
 	}
 	__HAL_TIM_DISABLE(DLY_TIM_Handle);
 }
+
+
+
+
+
+
+static void delay_us_init(TIM_HandleTypeDef *htim, uint32_t us)
+{
+    // 时钟频率为240MHz
+    static const uint32_t timer_freq = 240000000;
+	  //分频系数
+	  static const uint16_t timer_psc  = 119;  
+    // 计算ARR值
+    uint32_t arr_value = ((timer_freq/1000000*us)/(timer_psc+1)-1);
+    
+    // 停止定时器
+    HAL_TIM_Base_Stop(htim);
+    
+    // 设置自动重装载值
+    __HAL_TIM_SET_AUTORELOAD(htim, arr_value);
+    
+    // 启动定时器
+    HAL_TIM_Base_Start(htim);
+}
+
+
+void tim_delay_us(TIM_HandleTypeDef *htim, uint32_t us)
+{
+    // 初始化定时器
+    delay_us_init(htim, us);
+    
+    // 等待计数完成
+    while (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_UPDATE) == RESET);
+    __HAL_TIM_CLEAR_FLAG(htim, TIM_FLAG_UPDATE);
+}
+
+
+
 
 
 /* USER CODE END 1 */

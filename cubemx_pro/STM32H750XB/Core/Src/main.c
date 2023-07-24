@@ -44,8 +44,8 @@
 #include "sdram.h"
 #include "w25qxx.h"
 #include "qspi_w25q64.h"
-
 #include "usbd_storage_if.h"
+#include "ap6212_wifi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -171,6 +171,7 @@ int main(void)
   MX_SPI1_Init();
   MX_QUADSPI_Init();
   MX_USB_DEVICE_Init();
+  MX_SDMMC2_SD_Init();
   /* USER CODE BEGIN 2 */
   //点亮
 //	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
@@ -183,7 +184,8 @@ int main(void)
 		
 	    //HAL_TIM_Base_Start_IT(&htim6);
 			
-			
+	 HAL_TIM_Base_Start(&htim6);/*启动定时器*/	
+	
 	  printf("STM32H750XB !!!\r\n");	
 	    //PAJ7620_Init();
 			
@@ -196,10 +198,13 @@ int main(void)
 //      HAL_Delay(200);
 //      SD_EraseTest();
 //      SD_Write_Read_Test();
-	
+//	     HAL_SD_InitCard(&hsd2);
+//	     HAL_SD_Init(&hsd2);
 	     //fatfs_test();
-			 
-			   mount_sd();
+				HAL_GPIO_WritePin(GPIOC, LED_R_Pin|WIFI_REG_ON_Pin, GPIO_PIN_RESET);
+//			HAL_Delay(10);
+//		  HAL_GPIO_WritePin(GPIOC, LED_R_Pin|WIFI_REG_ON_Pin, GPIO_PIN_SET); 
+			   //mount_sd();
 			
       //fsmc_sdram_test();
 			
@@ -234,7 +239,7 @@ int main(void)
 //printf("read date is %s\r\n", (char*)read_buf);
 
 
-
+    //get_ap6212_wifi_informatization();
 	 
   /* USER CODE END 2 */
 
@@ -331,9 +336,12 @@ int main(void)
 //    USBD_CDC_TransmitPacket(&hUsbDeviceFS);
 
 //    HAL_Delay(1000);
-
-
-
+    HAL_GPIO_WritePin(GPIOB, PB2_Pin, GPIO_PIN_RESET);
+    tim_delay_us(&htim6,1);/*1us*/
+	
+		
+    HAL_GPIO_WritePin(GPIOB, PB2_Pin, GPIO_PIN_SET);
+    tim_delay_us(&htim6,1);/*1us*/
 
 
 
