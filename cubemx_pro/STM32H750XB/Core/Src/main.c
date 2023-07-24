@@ -91,6 +91,9 @@ uint8_t ID[2];
 uint8_t dat[11] = "mculover666";
 uint8_t read_buf[11] = {0};
 uint8_t UserTxBuffer[] = "usb cdc test!\r\n";
+
+ uint16_t  ccr2=200;
+ uint16_t  ccr3=100;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -172,6 +175,7 @@ int main(void)
   MX_QUADSPI_Init();
   MX_USB_DEVICE_Init();
   MX_SDMMC2_SD_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
   //点亮
 //	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
@@ -240,7 +244,10 @@ int main(void)
 
 
     //get_ap6212_wifi_informatization();
-	 
+	 HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_2);//初始化通道2
+   HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_3);//初始化通道3
+	 TIM5->CCR2 = 200 ; 
+	 TIM5->CCR3 = 800 ; 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -250,6 +257,39 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		
+		//tim_pwm_pluse_change(&ccr2);
+ static uint16_t ccr2=200;
+ static uint16_t Pulse_flag=1;			
+
+		
+		if(Pulse_flag==1)
+		{
+		   ccr2++;
+			   if(ccr2>=800)
+				  Pulse_flag=2;
+			HAL_Delay(1);
+		}
+		else if(Pulse_flag==2)
+		{
+		   ccr2--;
+			if(ccr2<=200)
+			
+			Pulse_flag=1;
+			
+			HAL_Delay(1);
+		}
+			
+			 TIM5->CCR2 = ccr2; 
+		
+	
+		
+	
+		
+		
+		
+		
+		
 	   //key_process();
 		/*PC3接电位器测试*/
 //		HAL_Delay(500);
@@ -336,12 +376,12 @@ int main(void)
 //    USBD_CDC_TransmitPacket(&hUsbDeviceFS);
 
 //    HAL_Delay(1000);
-    HAL_GPIO_WritePin(GPIOB, PB2_Pin, GPIO_PIN_RESET);
-    tim_delay_us(&htim6,1);/*1us*/
-	
-		
-    HAL_GPIO_WritePin(GPIOB, PB2_Pin, GPIO_PIN_SET);
-    tim_delay_us(&htim6,1);/*1us*/
+//    HAL_GPIO_WritePin(GPIOB, PB2_Pin, GPIO_PIN_RESET);
+//    tim_delay_us(&htim6,1);/*1us*/
+//	tim_delay_us(&htim6,10);/*1us*/
+//		
+//    HAL_GPIO_WritePin(GPIOB, PB2_Pin, GPIO_PIN_SET);
+    
 
 
 
