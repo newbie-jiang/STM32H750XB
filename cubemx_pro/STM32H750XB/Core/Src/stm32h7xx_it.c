@@ -25,7 +25,7 @@
 #include "bsp.h"
 #include "app.h"
 #include "stdio.h"
-#include <stdbool.h>
+#include "irda_nec.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -38,7 +38,7 @@
  uint16_t tick_us_count;
  
  bool isValueChanged = false;  // 标记变量是否改变
- 
+ bool nec_ValueChanged = false;  // 标记变量是否改变
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -68,6 +68,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
@@ -238,6 +239,29 @@ void EXTI4_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_IRQn 1 */
 
   /* USER CODE END EXTI4_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM5 global interrupt.
+  */
+void TIM5_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM5_IRQn 0 */
+
+  /* USER CODE END TIM5_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim5);
+  /* USER CODE BEGIN TIM5_IRQn 1 */
+	
+  
+	nec_ValueChanged=true;
+	
+	
+	uint32_t code=IC_IRDA_NEC();
+	if(code!=0x00)
+	{
+	 printf("%08x\r\n",code);
+	}
+  /* USER CODE END TIM5_IRQn 1 */
 }
 
 /**

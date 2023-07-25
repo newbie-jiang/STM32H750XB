@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H750xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../BSP;../APPlication;../BSP/PAJ7620U2_;../BSP/OLED/u8g2/csrc;../BSP/OLED;../BSP/DHT11;../BSP/mSD_card;../BSP/delay;../FATFS/Target;../FATFS/App;../Middlewares/Third_Party/FatFs/src;../BSP/SDRAM;../BSP/w25Qxx;../BSP/QSPI_W25q64;../USB_DEVICE/App;../USB_DEVICE/Target;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Inc;../BSP/AP6212</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../BSP;../APPlication;../BSP/PAJ7620U2_;../BSP/OLED/u8g2/csrc;../BSP/OLED;../BSP/DHT11;../BSP/mSD_card;../BSP/delay;../FATFS/Target;../FATFS/App;../Middlewares/Third_Party/FatFs/src;../BSP/SDRAM;../BSP/w25Qxx;../BSP/QSPI_W25q64;../USB_DEVICE/App;../USB_DEVICE/Target;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Inc;../BSP/AP6212;..\BSP\IRDA</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1935,6 +1935,11 @@
               <FileName>ap6212_wifi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\AP6212\ap6212_wifi.c</FilePath>
+            </File>
+            <File>
+              <FileName>irda_nec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\IRDA\irda_nec.c</FilePath>
             </File>
           </Files>
         </Group>

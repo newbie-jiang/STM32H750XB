@@ -188,8 +188,8 @@ int main(void)
 		
 	    //HAL_TIM_Base_Start_IT(&htim6);
 			
-	 HAL_TIM_Base_Start(&htim6);/*启动定时器*/	
-	
+	  HAL_TIM_Base_Start(&htim6);/*启动定时器*/	
+	  HAL_TIM_IC_Start_IT(&htim5,TIM_CHANNEL_3);
 	  printf("STM32H750XB !!!\r\n");	
 	    //PAJ7620_Init();
 			
@@ -244,10 +244,10 @@ int main(void)
 
 
     //get_ap6212_wifi_informatization();
-	 HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_2);//初始化通道2
-   HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_3);//初始化通道3
-	 TIM5->CCR2 = 200 ; 
-	 TIM5->CCR3 = 800 ; 
+//	 HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_2);//初始化通道2
+//   HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_3);//初始化通道3
+//	 TIM5->CCR2 = 200 ; 
+//	 TIM5->CCR3 = 800 ; 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -259,28 +259,28 @@ int main(void)
     /* USER CODE BEGIN 3 */
 		
 		//tim_pwm_pluse_change(&ccr2);
- static uint16_t ccr2=200;
- static uint16_t Pulse_flag=1;			
+// static uint16_t ccr2=200;
+// static uint16_t Pulse_flag=1;			
 
-		
-		if(Pulse_flag==1)
-		{
-		   ccr2++;
-			   if(ccr2>=800)
-				  Pulse_flag=2;
-			HAL_Delay(1);
-		}
-		else if(Pulse_flag==2)
-		{
-		   ccr2--;
-			if(ccr2<=200)
-			
-			Pulse_flag=1;
-			
-			HAL_Delay(1);
-		}
-			
-			 TIM5->CCR2 = ccr2; 
+//		
+//		if(Pulse_flag==1)
+//		{
+//		   ccr2++;
+//			   if(ccr2>=800)
+//				  Pulse_flag=2;
+//			HAL_Delay(1);
+//		}
+//		else if(Pulse_flag==2)
+//		{
+//		   ccr2--;
+//			if(ccr2<=200)
+//			
+//			Pulse_flag=1;
+//			
+//			HAL_Delay(1);
+//		}
+//			
+//			 TIM5->CCR2 = ccr2; 
 		
 	
 		
