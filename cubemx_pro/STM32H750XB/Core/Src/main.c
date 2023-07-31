@@ -19,8 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma2d.h"
 #include "fatfs.h"
 #include "i2c.h"
+#include "ltdc.h"
 #include "quadspi.h"
 #include "sdmmc.h"
 #include "spi.h"
@@ -48,6 +50,8 @@
 #include "ap6212_wifi.h"
 #include "irda_nec.h"
 #include "tim_cap.h"
+#include "lcd.h"
+#include "app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -181,6 +185,8 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_LTDC_Init();
+  MX_DMA2D_Init();
   /* USER CODE BEGIN 2 */
   //点亮
 //	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
@@ -199,15 +205,62 @@ int main(void)
 		
 //		HAL_TIM_PWM_Init(&htim3);
 //		 HAL_TIM_Base_Start(&htim3);/*启动定时器*/	
-		 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+//		 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
 	  
 		
 		
-		 HAL_TIM_Base_Start_IT(&htim2);/*开启更新中断*/	
-		 HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
-		 HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_2);
+//		 HAL_TIM_Base_Start_IT(&htim2);/*开启更新中断*/	
+//		 HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
+//		 HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_2);
 		
-	   printf("STM32H750XB !!!\r\n");	
+	    printf("STM32H750XB !!!\r\n");	
+			/*该实验使用SDRAM*/
+		  SDRAM_InitSequence(); /*初始化SDRAM*/
+		
+		  LCD_Init();
+		  POINT_COLOR=RED; /*画笔颜色*/ 
+	    LCD_Display_Dir(1);		//屏幕显示方向：0竖屏，1横屏
+			
+			
+			
+	    LCD_Clear(WHITE);
+//    LCD_Clear(BLACK);
+//		LCD_Clear(BLUE);
+//		LCD_Clear(RED);
+//		LCD_Clear(MAGENTA);
+//		LCD_Clear(GREEN);
+//		LCD_Clear(CYAN);
+//		LCD_Clear(YELLOW);
+//		LCD_Clear(BRRED);
+//		LCD_Clear(GRAY);
+//		LCD_Clear(LGRAY);
+//		LCD_Clear(BROWN);
+
+      
+			
+			LCD_Fill(20 , 80,120 ,400,0xFFE0);
+			LCD_Fill(140, 80,240 ,400,0x8888);
+			LCD_Fill(260, 80,360 ,400,0x2222);
+			LCD_Fill(380, 80,480 ,400,0xbbbb); 
+			
+			LCD_Fill(20,400,480,475,0x1111);
+			
+		  LCD_ShowString(100,10,800,80,32,"Newbie:STM32H750XB Display LCD RGB888"); 
+			
+			
+			LCD_DrawRectangle(500,120,780,400);/*画矩形*/
+			
+			LCD_Draw_Circle(640,260,137);/*画圆*/
+			LCD_Draw_Circle(640,260,117);/*画圆*/
+			LCD_Draw_Circle(640,260,97);/*画圆*/
+			LCD_Draw_Circle(640,260,77);/*画圆*/
+			LCD_Draw_Circle(640,260,57);/*画圆*/
+			LCD_Draw_Circle(640,260,37);/*画圆*/
+			LCD_Draw_Circle(640,260,17);/*画圆*/
+			
+		  
+			//LCD_ShowString(10,50,80,750,32,"Newbie:STM32H750XB LCD Display"); 
+		 
 	    //PAJ7620_Init();
 			
 			//DHT11_Init();
@@ -275,7 +328,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		
-		
+		//LCD_ShowString(10,40,240,32,32,"POLARIS H750/F750"); 	
 		// printf("PWM_Frequency = %d \r\n",PWM_RisingCount);
 		
 	
@@ -486,8 +539,9 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SDMMC
-                              |RCC_PERIPHCLK_SPI1;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC
+                              |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_SPI1
+                              |RCC_PERIPHCLK_LTDC;
   PeriphClkInitStruct.PLL2.PLL2M = 2;
   PeriphClkInitStruct.PLL2.PLL2N = 16;
   PeriphClkInitStruct.PLL2.PLL2P = 4;
@@ -496,8 +550,17 @@ void PeriphCommonClock_Config(void)
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+  PeriphClkInitStruct.PLL3.PLL3M = 5;
+  PeriphClkInitStruct.PLL3.PLL3N = 50;
+  PeriphClkInitStruct.PLL3.PLL3P = 1;
+  PeriphClkInitStruct.PLL3.PLL3Q = 5;
+  PeriphClkInitStruct.PLL3.PLL3R = 5;
+  PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_2;
+  PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
+  PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
   PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
+  PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_PLL3;
   PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
