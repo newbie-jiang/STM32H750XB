@@ -46,6 +46,8 @@
 #include "qspi_w25q64.h"
 #include "usbd_storage_if.h"
 #include "ap6212_wifi.h"
+#include "irda_nec.h"
+#include "tim_cap.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -134,6 +136,7 @@ int main(void)
   uint8_t t;
   uint8_t temperature;  	    
 	uint8_t humidity; 
+	uint32_t time = 0;
   /* USER CODE END 1 */
 
   /* Enable I-Cache---------------------------------------------------------*/
@@ -176,6 +179,8 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_SDMMC2_SD_Init();
   MX_TIM5_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   //点亮
 //	HAL_ADCEx_Calibration_Start(&hadc3,ADC_CALIB_OFFSET,ADC_SINGLE_ENDED);//校准ADC
@@ -186,11 +191,23 @@ int main(void)
 
     //SDRAM_InitSequence();
 		
-	    //HAL_TIM_Base_Start_IT(&htim6);
-			
-	  HAL_TIM_Base_Start(&htim6);/*启动定时器*/	
-	  HAL_TIM_IC_Start_IT(&htim5,TIM_CHANNEL_3);
-	  printf("STM32H750XB !!!\r\n");	
+	    HAL_TIM_Base_Start_IT(&htim6);
+		  
+		
+	
+		//HAL_TIM_IC_Start_IT(&htim5,TIM_CHANNEL_3);
+		
+//		HAL_TIM_PWM_Init(&htim3);
+//		 HAL_TIM_Base_Start(&htim3);/*启动定时器*/	
+		 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+	  
+		
+		
+		 HAL_TIM_Base_Start_IT(&htim2);/*开启更新中断*/	
+		 HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
+		 HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_2);
+		
+	   printf("STM32H750XB !!!\r\n");	
 	    //PAJ7620_Init();
 			
 			//DHT11_Init();
@@ -205,7 +222,7 @@ int main(void)
 //	     HAL_SD_InitCard(&hsd2);
 //	     HAL_SD_Init(&hsd2);
 	     //fatfs_test();
-				HAL_GPIO_WritePin(GPIOC, LED_R_Pin|WIFI_REG_ON_Pin, GPIO_PIN_RESET);
+			//	HAL_GPIO_WritePin(GPIOC, LED_R_Pin|WIFI_REG_ON_Pin, GPIO_PIN_RESET);
 //			HAL_Delay(10);
 //		  HAL_GPIO_WritePin(GPIOC, LED_R_Pin|WIFI_REG_ON_Pin, GPIO_PIN_SET); 
 			   //mount_sd();
@@ -257,6 +274,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		
+		
+		// printf("PWM_Frequency = %d \r\n",PWM_RisingCount);
+		
+	
+		
 		
 		//tim_pwm_pluse_change(&ccr2);
 // static uint16_t ccr2=200;
@@ -519,7 +542,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  if (htim->Instance == TIM2)
+    {
+      TIM2_OverflowCount++;
+	}
+			//printf("OverflowCount=%d\r\n",OverflowCount);
+			
+    
   /* USER CODE END Callback 1 */
 }
 

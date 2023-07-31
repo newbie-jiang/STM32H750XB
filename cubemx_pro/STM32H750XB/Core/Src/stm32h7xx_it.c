@@ -22,10 +22,13 @@
 #include "stm32h7xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
 #include "bsp.h"
 #include "app.h"
 #include "stdio.h"
+#include "usart.h"
 #include "irda_nec.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,6 +42,13 @@
  
  bool isValueChanged = false;  // 标记变量是否改变
  bool nec_ValueChanged = false;  // 标记变量是否改变
+ 
+
+
+uint32_t IC_TIMES;  // 捕获次数，单位1ms
+uint8_t IC_START_FLAG;  // 捕获开始标志，1：已捕获到高电平；0：还没有捕获到高电平
+uint8_t IC_DONE_FLAG;  // 捕获完成标志，1：已完成一次高电平捕获
+uint16_t IC_VALUE;  // 输入捕获的捕获值
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -68,6 +78,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim7;
 
@@ -239,6 +250,34 @@ void EXTI4_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_IRQn 1 */
 
   /* USER CODE END EXTI4_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM2 global interrupt.
+  */
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+static uint32_t CurrentCapture=0;
+static uint8_t  Is_First_Captured = 0;  // 0= not captured, 1= captured
+static uint8_t sampling_count;
+	sampling_count++;
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+	
+    
+
+		
+		
+  
+	
+//	printf("Period=%d\r\n",Period);
+//	     printf("DutyCycle=%d\r\n",DutyCycle);
+//	
+	
+  //HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
+  /* USER CODE END TIM2_IRQn 1 */
 }
 
 /**
@@ -507,6 +546,7 @@ uint32_t scan_irda(void)
 		
 			
 }
+
 
 
 

@@ -29,6 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
 #include <stdbool.h>
+#include "stdint.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -40,6 +41,13 @@ unsigned int scan_irda(void);
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
  extern bool nec_ValueChanged;  // 标记变量是否改变
+ extern  uint32_t OverflowCount;
+ 
+ 
+extern uint32_t IC_TIMES;  // 捕获次数，单位1ms
+extern uint8_t IC_START_FLAG;  // 捕获开始标志，1：已捕获到高电平；0：还没有捕获到高电平
+extern uint8_t IC_DONE_FLAG;  // 捕获完成标志，1：已完成一次高电平捕获
+extern uint16_t IC_VALUE;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -59,6 +67,7 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 void EXTI3_IRQHandler(void);
 void EXTI4_IRQHandler(void);
+void TIM2_IRQHandler(void);
 void TIM5_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void OTG_FS_IRQHandler(void);
