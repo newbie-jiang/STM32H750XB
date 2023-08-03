@@ -52,6 +52,8 @@
 #include "tim_cap.h"
 #include "lcd.h"
 #include "app.h"
+#include "touch.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -250,17 +252,33 @@ int main(void)
 			
 			LCD_DrawRectangle(500,120,780,400);/*ª≠æÿ–Œ*/
 			
-			LCD_Draw_Circle(640,260,137);/*ª≠‘≤*/
-			LCD_Draw_Circle(640,260,117);/*ª≠‘≤*/
-			LCD_Draw_Circle(640,260,97);/*ª≠‘≤*/
-			LCD_Draw_Circle(640,260,77);/*ª≠‘≤*/
-			LCD_Draw_Circle(640,260,57);/*ª≠‘≤*/
-			LCD_Draw_Circle(640,260,37);/*ª≠‘≤*/
-			LCD_Draw_Circle(640,260,17);/*ª≠‘≤*/
+//			LCD_Draw_Circle(640,260,137);/*ª≠‘≤*/
+//			LCD_Draw_Circle(640,260,117);/*ª≠‘≤*/
+//			LCD_Draw_Circle(640,260,97);/*ª≠‘≤*/
+//			LCD_Draw_Circle(640,260,77);/*ª≠‘≤*/
+//			LCD_Draw_Circle(640,260,57);/*ª≠‘≤*/
+//			LCD_Draw_Circle(640,260,37);/*ª≠‘≤*/
+//			LCD_Draw_Circle(640,260,17);/*ª≠‘≤*/
 			
-		  
-			//LCD_ShowString(10,50,80,750,32,"Newbie:STM32H750XB LCD Display"); 
-		 
+			
+			for(int i=137;i>=1;i-=3)
+			{
+			 LCD_Draw_Circle(640,260,i);/*ª≠‘≤*/
+			}
+			
+			
+		  HAL_Delay(3000);
+			LCD_Clear(WHITE);
+			LCD_ShowString(150,240,800,300,32,"Newbie:STM32H750XB Touch test!"); 
+			HAL_Delay(3000);
+			LCD_Clear(WHITE);
+			
+		  tp_dev.init();                      /* ¥•√˛∆¡≥ı ºªØ */
+		  HAL_Delay(2000);
+		  printf("run here\r\n");
+		  ctp_test(); /* µÁ»›∆¡≤‚ ‘ */
+    //gt9xxx_scan();
+		
 	    //PAJ7620_Init();
 			
 			//DHT11_Init();
@@ -327,6 +345,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//		tim_delay_us(&htim6,2);
+//		HAL_GPIO_TogglePin(GPIOB, PB2_Pin);
+//		
 		
 		//LCD_ShowString(10,40,240,32,32,"POLARIS H750/F750"); 	
 		// printf("PWM_Frequency = %d \r\n",PWM_RisingCount);

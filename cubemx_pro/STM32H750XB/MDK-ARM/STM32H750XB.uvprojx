@@ -54,7 +54,7 @@
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
-          <BrowseInformation>0</BrowseInformation>
+          <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\STM32H750XB\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H750xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../BSP;../APPlication;../BSP/PAJ7620U2_;../BSP/OLED/u8g2/csrc;../BSP/OLED;../BSP/DHT11;../BSP/mSD_card;../BSP/delay;../FATFS/Target;../FATFS/App;../Middlewares/Third_Party/FatFs/src;../BSP/SDRAM;../BSP/w25Qxx;../BSP/QSPI_W25q64;../USB_DEVICE/App;../USB_DEVICE/Target;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Inc;../BSP/AP6212;../BSP/IRDA;../BSP/TIM_Capture;..\BSP\LCD;..\BSP\sys</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../BSP;../APPlication;../BSP/PAJ7620U2_;../BSP/OLED/u8g2/csrc;../BSP/OLED;../BSP/DHT11;../BSP/mSD_card;../BSP/delay;../FATFS/Target;../FATFS/App;../Middlewares/Third_Party/FatFs/src;../BSP/SDRAM;../BSP/w25Qxx;../BSP/QSPI_W25q64;../USB_DEVICE/App;../USB_DEVICE/Target;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Inc;../BSP/AP6212;../BSP/IRDA;../BSP/TIM_Capture;../BSP/LCD;../BSP/sys;../BSP/TOUCH</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2240,6 +2240,21 @@
               <FileName>lcd.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>ctiic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\TOUCH\ctiic.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt9xxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\TOUCH\gt9xxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\TOUCH\touch.c</FilePath>
             </File>
           </Files>
         </Group>

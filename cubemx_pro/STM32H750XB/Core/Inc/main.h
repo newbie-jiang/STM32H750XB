@@ -59,8 +59,16 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define GPIO_LCD_BL_Pin GPIO_PIN_4
 #define GPIO_LCD_BL_GPIO_Port GPIOD
+#define TOUCH_SCL_Pin GPIO_PIN_6
+#define TOUCH_SCL_GPIO_Port GPIOB
+#define TOUCH_RESET_Pin GPIO_PIN_3
+#define TOUCH_RESET_GPIO_Port GPIOD
 #define LED_R_Pin GPIO_PIN_15
 #define LED_R_GPIO_Port GPIOC
+#define TOUCH_SDA_Pin GPIO_PIN_7
+#define TOUCH_SDA_GPIO_Port GPIOB
+#define GPIO_TS_IIC_INT_Pin GPIO_PIN_12
+#define GPIO_TS_IIC_INT_GPIO_Port GPIOG
 #define WL_HOST_WAKE_Pin GPIO_PIN_3
 #define WL_HOST_WAKE_GPIO_Port GPIOE
 #define WL_HOST_WAKE_EXTI_IRQn EXTI3_IRQn

@@ -2253,6 +2253,190 @@ void LCD_ShowString(u16 x,u16 y,u16 width,u16 height,uint8_t size,uint8_t *p)
 }
 
 
+/***************************************************************************************************************/
+
+
+void lcd_wr_regno(volatile uint16_t regno)
+{
+    regno = regno;          /* 使用-O2优化的时候,必须插入的延时 */
+    LCD->LCD_REG = regno;   /* 写入要写的寄存器序号 */
+}
+
+
+/**
+ * @brief       设置光标位置(对RGB屏无效)
+ * @param       x,y: 坐标
+ * @retval      无
+ */
+void lcd_set_cursor(uint16_t x, uint16_t y)
+{
+    if (lcddev.id == 0X1963)
+    {
+        if (lcddev.dir == 0)    /* 竖屏模式, x坐标需要变换 */
+        {
+            x = lcddev.width - 1 - x;
+            lcd_wr_regno(lcddev.setxcmd);
+            LCD_WR_DATA(0);
+            LCD_WR_DATA(0);
+            LCD_WR_DATA(x >> 8);
+            LCD_WR_DATA(x & 0XFF);
+        }
+        else                    /* 横屏模式 */
+        {
+            lcd_wr_regno(lcddev.setxcmd);
+            LCD_WR_DATA(x >> 8);
+            LCD_WR_DATA(x & 0XFF);
+            LCD_WR_DATA((lcddev.width - 1) >> 8);
+            LCD_WR_DATA((lcddev.width - 1) & 0XFF);
+        }
+
+        lcd_wr_regno(lcddev.setycmd);
+        LCD_WR_DATA(y >> 8);
+        LCD_WR_DATA(y & 0XFF);
+        LCD_WR_DATA((lcddev.height - 1) >> 8);
+        LCD_WR_DATA((lcddev.height - 1) & 0XFF);
+
+    }
+    else if (lcddev.id == 0X5510)
+    {
+        lcd_wr_regno(lcddev.setxcmd);
+        LCD_WR_DATA(x >> 8);
+        lcd_wr_regno(lcddev.setxcmd + 1);
+        LCD_WR_DATA(x & 0XFF);
+        lcd_wr_regno(lcddev.setycmd);
+        LCD_WR_DATA(y >> 8);
+        lcd_wr_regno(lcddev.setycmd + 1);
+        LCD_WR_DATA(y & 0XFF);
+    }
+    else    /* 9341/5310/7789 等 设置坐标 */
+    {
+        lcd_wr_regno(lcddev.setxcmd);
+        LCD_WR_DATA(x >> 8);
+        LCD_WR_DATA(x & 0XFF);
+        lcd_wr_regno(lcddev.setycmd);
+        LCD_WR_DATA(y >> 8);
+        LCD_WR_DATA(y & 0XFF);
+    }
+}
+
+/**
+ * @brief       准备写GRAM
+ * @param       无
+ * @retval      无
+ */
+void lcd_write_ram_prepare(void)
+{
+    LCD->LCD_REG = lcddev.wramcmd;
+}
+
+/**
+ * @brief       画点
+ * @param       x,y: 坐标
+ * @param       color: 点的颜色(32位颜色,方便兼容LTDC)
+ * @retval      无
+ */
+void lcd_draw_point(uint16_t x, uint16_t y, uint32_t color)
+{
+    lcd_set_cursor(x, y);       /* 设置光标位置 */
+    lcd_write_ram_prepare();    /* 开始写入GRAM */
+    LCD->LCD_RAM = color;
+}
+
+/**
+ * @brief       在指定位置显示一个字符
+ * @param       x,y  : 坐标
+ * @param       chr  : 要显示的字符:" "--->"~"
+ * @param       size : 字体大小 12/16/24/32
+ * @param       mode : 叠加方式(1); 非叠加方式(0);
+ * @retval      无
+ */
+void lcd_show_char(uint16_t x, uint16_t y, char chr, uint8_t size, uint8_t mode, uint16_t color)
+{
+    uint8_t temp, t1, t;
+    uint16_t y0 = y;
+    uint8_t csize = 0;
+    uint8_t *pfont = 0;
+
+    csize = (size / 8 + ((size % 8) ? 1 : 0)) * (size / 2); /* 得到字体一个字符对应点阵集所占的字节数 */
+    chr = chr - ' ';    /* 得到偏移后的值（ASCII字库是从空格开始取模，所以-' '就是对应字符的字库） */
+
+    switch (size)
+    {
+        case 12:
+            pfont = (uint8_t *)asc2_1206[chr];  /* 调用1206字体 */
+            break;
+
+        case 16:
+            pfont = (uint8_t *)asc2_1608[chr];  /* 调用1608字体 */
+            break;
+
+        case 24:
+            pfont = (uint8_t *)asc2_2412[chr];  /* 调用2412字体 */
+            break;
+
+        case 32:
+            pfont = (uint8_t *)asc2_3216[chr];  /* 调用3216字体 */
+            break;
+
+        default:
+            return ;
+    }
+
+    for (t = 0; t < csize; t++)
+    {
+        temp = pfont[t];    /* 获取字符的点阵数据 */
+
+        for (t1 = 0; t1 < 8; t1++)   /* 一个字节8个点 */
+        {
+            if (temp & 0x80)        /* 有效点,需要显示 */
+            {
+                lcd_draw_point(x, y, color);        /* 画点出来,要显示这个点 */
+            }
+            else if (mode == 0)     /* 无效点,不显示 */
+            {
+                lcd_draw_point(x, y, 0xffff); /* 画背景色,相当于这个点不显示(注意背景色由全局变量控制) */
+            }
+
+            temp <<= 1; /* 移位, 以便获取下一个位的状态 */
+            y++;
+
+            if (y >= lcddev.height)return;  /* 超区域了 */
+
+            if ((y - y0) == size)   /* 显示完一列了? */
+            {
+                y = y0; /* y坐标复位 */
+                x++;    /* x坐标递增 */
+
+                if (x >= lcddev.width)return;   /* x坐标超区域了 */
+
+                break;
+            }
+        }
+    }
+}
+
+
+void lcd_show_string(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, char *p, uint16_t color)
+{
+    uint8_t x0 = x;
+    width += x;
+    height += y;
+
+    while ((*p <= '~') && (*p >= ' '))   /* 判断是不是非法字符! */
+    {
+        if (x >= width)
+        {
+            x = x0;
+            y += size;
+        }
+
+        if (y >= height)break;  /* 退出 */
+
+        lcd_show_char(x, y, *p, size, 0, color);
+        x += size / 2;
+        p++;
+    }
+}
 
 
 

@@ -403,7 +403,8 @@ void LTDC_Init(void)
 		lcdltdc.vbp=32;				    //垂直后廊
 		lcdltdc.vfp=13;				    //垂直前廊
 		lcdltdc.vsw=3;				    //垂直同步宽度
-		LTDC_Clk_Set(5,160,24);			//设置像素时钟 33M
+		//LTDC_Clk_Set(5,160,24);			//设置像素时钟 33M
+		LTDC_Clk_Set(5,40,8);			//设置像素时钟 20M
 		//其他参数待定.
 	}else if(lcdid==0X1018)				//10.1寸1280*800 RGB屏	
 	{
