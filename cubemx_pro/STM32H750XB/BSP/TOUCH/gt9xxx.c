@@ -31,9 +31,20 @@
 #include "ctiic.h"
 #include "gt9xxx.h"
 #include "usart.h"
-#include "tim.h"
-
+#include "delay.h"
 #include "stdio.h"
+
+
+
+
+Touch_coordinates sTouch_coordinates;
+
+
+
+
+
+
+
 
 /* 注意: 除了GT9271支持10点触摸之外, 其他触摸芯片只支持 5点触摸 */
 uint8_t g_gt_tnum = 5;      /* 默认支持的触摸屏点数(5点触摸) */
@@ -111,8 +122,6 @@ uint8_t gt9xxx_init(void)
     GT9XXX_RST_GPIO_CLK_ENABLE();   /* RST引脚时钟使能 */
     GT9XXX_INT_GPIO_CLK_ENABLE();   /* INT引脚时钟使能 */
 
-	/*默认低电平*/
-	  //HAL_GPIO_WritePin(GPIO_LCD_BL_GPIO_Port, GPIO_LCD_BL_Pin, GPIO_PIN_SET);
     gpio_init_struct.Pin = GT9XXX_RST_GPIO_PIN;
     gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;            /* 推挽输出 */
     gpio_init_struct.Pull = GPIO_PULLUP;                    /* 上拉 */
@@ -127,31 +136,31 @@ uint8_t gt9xxx_init(void)
 
     ct_iic_init();      /* 初始化电容屏的I2C总线 */
     GT9XXX_RST(0);      /* 复位 */
-    tim_delay_us(&htim6,200);
+    delay_ms(10);
     GT9XXX_RST(1);      /* 释放复位 */
-//    tim_delay_us(&htim6,10);
+    delay_ms(10);
 
     /* INT引脚模式设置, 输入模式, 浮空输入 */
-//    gpio_init_struct.Pin = GT9XXX_INT_GPIO_PIN;
-//    gpio_init_struct.Mode = GPIO_MODE_INPUT;                /* 输入 */
-//    gpio_init_struct.Pull = GPIO_NOPULL;                    /* 不带上下拉，浮空模式 */
-//    gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;          /* 高速 */
-//    HAL_GPIO_Init(GT9XXX_INT_GPIO_PORT, &gpio_init_struct); /* 初始化INT引脚 */
+    gpio_init_struct.Pin = GT9XXX_INT_GPIO_PIN;
+    gpio_init_struct.Mode = GPIO_MODE_INPUT;                /* 输入 */
+    gpio_init_struct.Pull = GPIO_NOPULL;                    /* 不带上下拉，浮空模式 */
+    gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;          /* 高速 */
+    HAL_GPIO_Init(GT9XXX_INT_GPIO_PORT, &gpio_init_struct); /* 初始化INT引脚 */
 
-    tim_delay_us(&htim6,100);
+    delay_ms(100);
     gt9xxx_rd_reg(GT9XXX_PID_REG, temp, 4); /* 读取产品ID */
     temp[4] = 0;
     printf("CTP ID:%s\r\n", temp);          /* 打印ID */
     
-//    if (strcmp((char *)temp, "9271") == 0)  /* ID==9271, 支持10点触摸 */
-//    {
-//         g_gt_tnum = 10;    /* 支持10点触摸屏 */
-//    }
+    if (strcmp((char *)temp, "9271") == 0)  /* ID==9271, 支持10点触摸 */
+    {
+         g_gt_tnum = 10;    /* 支持10点触摸屏 */
+    }
     
     temp[0] = 0X02;
     gt9xxx_wr_reg(GT9XXX_CTRL_REG, temp, 1);    /* 软复位GT9XXX */
     
-   tim_delay_us(&htim6,10);
+    delay_ms(10);
     
     temp[0] = 0X00;
     gt9xxx_wr_reg(GT9XXX_CTRL_REG, temp, 1);    /* 结束复位, 进入读坐标状态 */
@@ -233,6 +242,12 @@ uint8_t gt9xxx_scan(uint8_t mode)
 //                            tp_dev.y[i] = ((uint16_t)buf[1] << 8) + buf[0];
 //                        }
 //                    }
+												
+												
+												sTouch_coordinates.touch_switch=i;
+												sTouch_coordinates.touch_x=tp_dev.x[i];
+												sTouch_coordinates.touch_y=tp_dev.x[i];
+												
                     
                     printf("x[%d]:%d,y[%d]:%d\r\n", i, tp_dev.x[i], i, tp_dev.y[i]);
                 }

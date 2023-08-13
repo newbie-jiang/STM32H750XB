@@ -1,14 +1,14 @@
 #include "dht11.h"
 #include "delay.h"
 #include "gpio.h"
-
+#include "tim.h"
 void dht11_OUT(void)
 {
 	 GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOB_CLK_ENABLE();
 	
-  GPIO_InitStruct.Pin = DHT11_Pin|BUZZER_Pin;
+  GPIO_InitStruct.Pin = DHT11_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -38,12 +38,15 @@ uint8_t READ_DHT11(void)
 
 //复位DHT11
 void DHT11_Rst(void)	   
-{                 
+{ 
+  HAL_Delay(1000);	
 	DHT11_IO_OUT(); 	//设置为输出
 	DHT11_DQ_OUT(0); 	//拉低DQ
 	HAL_Delay(20);    	//拉低至少18ms
 	DHT11_DQ_OUT(1); 	//DQ=1 
 	delay_us(30);     	//主机拉高20~40us
+
+	
 }
 
 //等待DHT11的回应

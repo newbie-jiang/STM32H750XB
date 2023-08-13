@@ -1,7 +1,7 @@
 #include "paj7620u2.h"
 #include "paj7620u2_cfg.h"
 #include "stdint.h"
-
+#include "stdio.h"
 
 static void paj7620u2_selectBank(bank_e bank);//Ñ¡ÔñPAJ7620U2 BANKÇøÓò
 static uint8_t paj7620u2_wakeup(void);//PAJ7620U2»½ĞÑ
@@ -74,7 +74,7 @@ uint8_t paj7620u2_wakeup()
 	data = GS_Read_Byte(0x00);//¶ÁÈ¡×´Ì¬
 	if(data!=0x20) 
 	{
-	
+	 printf("wakeup_err\r\n");
 	 return 0; //»½ĞÑÊ§°Ü
 	}
 	

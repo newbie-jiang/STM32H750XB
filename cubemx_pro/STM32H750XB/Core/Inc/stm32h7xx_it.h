@@ -48,6 +48,9 @@ extern uint32_t IC_TIMES;  // 捕获次数，单位1ms
 extern uint8_t IC_START_FLAG;  // 捕获开始标志，1：已捕获到高电平；0：还没有捕获到高电平
 extern uint8_t IC_DONE_FLAG;  // 捕获完成标志，1：已完成一次高电平捕获
 extern uint16_t IC_VALUE;
+extern uint8_t irda_code_flag;
+
+extern bool GPIO_TS_IIC_INT_Pin_state;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -67,7 +70,8 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 void EXTI3_IRQHandler(void);
 void EXTI4_IRQHandler(void);
-void TIM2_IRQHandler(void);
+void DMA1_Stream0_IRQHandler(void);
+void EXTI15_10_IRQHandler(void);
 void TIM5_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void LTDC_IRQHandler(void);

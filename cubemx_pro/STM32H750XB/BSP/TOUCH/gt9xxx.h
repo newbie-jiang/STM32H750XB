@@ -31,6 +31,14 @@
 #include "sys.h"
 
 
+typedef struct touch_coordinates{
+
+uint8_t touch_switch;
+uint16_t touch_x;
+uint16_t	touch_y;
+}Touch_coordinates,*pTouch_coordinates;
+
+
 /******************************************************************************************/
 /* GT9XXX INT 和 RST 引脚 定义 */
 

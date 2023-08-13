@@ -32,7 +32,8 @@
 #include "stdlib.h"
 #include "lcd.h"
 #include "touch.h"
-#include "tim.h"
+#include "delay.h"
+
 
 _m_tp_dev tp_dev =
 {
@@ -74,7 +75,7 @@ static void tp_write_byte(uint8_t data)
 
         data <<= 1;
         T_CLK(0);
-        tim_delay_us(&htim6,1);
+        delay_us(1);
         T_CLK(1);           /* 上升沿有效 */
     }
 }
@@ -93,18 +94,18 @@ static uint16_t tp_read_ad(uint8_t cmd)
     T_MOSI(0);          /* 拉低数据线 */
     T_CS(0);            /* 选中触摸屏IC */
     tp_write_byte(cmd); /* 发送命令字 */
-    tim_delay_us(&htim6,6);        /* ADS7846的转换时间最长为6us */
+    delay_us(6);        /* ADS7846的转换时间最长为6us */
     T_CLK(0);
-    tim_delay_us(&htim6,1);
+    delay_us(1);
     T_CLK(1);           /* 给1个时钟，清除BUSY */
-    tim_delay_us(&htim6,1);
+    delay_us(1);
     T_CLK(0);
 
     for (count = 0; count < 16; count++)    /* 读出16位数据,只有高12位有效 */
     {
         num <<= 1;
         T_CLK(0);       /* 下降沿有效 */
-        tim_delay_us(&htim6,1);
+        delay_us(1);
         T_CLK(1);
 
         if (T_MISO)num++;
@@ -233,13 +234,13 @@ static uint8_t tp_read_xy2(uint16_t *x, uint16_t *y)
  */
 static void tp_draw_touch_point(uint16_t x, uint16_t y, uint16_t color)
 {
-    LCD_DrawLine(x - 12, y, x + 13, y); /* 横线 */
-    LCD_DrawLine(x, y - 12, x, y + 13); /* 竖线 */
-    LCD_DrawPoint(x + 1, y + 1);
-    LCD_DrawPoint(x - 1, y + 1);
-    LCD_DrawPoint(x + 1, y - 1);
-    LCD_DrawPoint(x - 1, y - 1);
-    LCD_Draw_Circle(x, y, 6);            /* 画中心圈 */
+    lcd_draw_line(x - 12, y, x + 13, y, color); /* 横线 */
+    lcd_draw_line(x, y - 12, x, y + 13, color); /* 竖线 */
+    lcd_draw_point(x + 1, y + 1, color);
+    lcd_draw_point(x - 1, y + 1, color);
+    lcd_draw_point(x + 1, y - 1, color);
+    lcd_draw_point(x - 1, y - 1, color);
+    lcd_draw_circle(x, y, 6, color);            /* 画中心圈 */
 }
 
 /**
@@ -250,10 +251,10 @@ static void tp_draw_touch_point(uint16_t x, uint16_t y, uint16_t color)
  */
 void tp_draw_big_point(uint16_t x, uint16_t y, uint16_t color)
 {
-    LCD_DrawPoint(x, y);       /* 中心点 */
-    LCD_DrawPoint(x + 1, y);
-    LCD_DrawPoint(x, y + 1);
-    LCD_DrawPoint(x + 1, y + 1);
+    lcd_draw_point(x, y, color);       /* 中心点 */
+    lcd_draw_point(x + 1, y, color);
+    lcd_draw_point(x, y + 1, color);
+    lcd_draw_point(x + 1, y + 1, color);
 }
 
 /******************************************************************************************/
@@ -342,20 +343,20 @@ void tp_save_adjust_data(void)
  */
 uint8_t tp_get_adjust_data(void)
 {
-    uint8_t *p = (uint8_t *)&tp_dev.xfac;
-    uint8_t temp = 0;
+//    uint8_t *p = (uint8_t *)&tp_dev.xfac;
+//    uint8_t temp = 0;
 
-    /* 由于我们是直接指向tp_dev.xfac地址进行保存的, 读取的时候,将读取出来的数据
-     * 写入指向tp_dev.xfac的首地址, 就可以还原写入进去的值, 而不需要理会具体的数
-     * 据类型. 此方法适用于各种数据(包括结构体)的保存/读取(包括结构体).
-     */
+//    /* 由于我们是直接指向tp_dev.xfac地址进行保存的, 读取的时候,将读取出来的数据
+//     * 写入指向tp_dev.xfac的首地址, 就可以还原写入进去的值, 而不需要理会具体的数
+//     * 据类型. 此方法适用于各种数据(包括结构体)的保存/读取(包括结构体).
+//     */
 //    at24cxx_read(TP_SAVE_ADDR_BASE, p, 12);                 /* 读取12字节数据 */
 //    temp = at24cxx_read_one_byte(TP_SAVE_ADDR_BASE + 12);   /* 读取校准状态标记 */
 
-    if (temp == 0X0A)
-    {
-        return 1;
-    }
+//    if (temp == 0X0A)
+//    {
+//        return 1;
+//    }
 
     return 0;
 }
@@ -383,7 +384,7 @@ static void tp_adjust_info_show(uint16_t xy[5][2], double px, double py)
     }
 
     /* 显示X/Y方向的比例因子 */
-    LCD_Fill(40, 160 + (i * 20), lcddev.width - 1, 16, WHITE);  /* 清除之前的px,py显示 */
+    lcd_fill(40, 160 + (i * 20), lcddev.width - 1, 16, WHITE);  /* 清除之前的px,py显示 */
     sprintf(sbuf, "px:%0.2f", px);
     sbuf[7] = 0; /* 添加结束符 */
     lcd_show_string(40, 160 + (i * 20), lcddev.width, lcddev.height, 16, sbuf, RED);
@@ -411,7 +412,7 @@ void tp_adjust(void)
     uint16_t outtime = 0;
     cnt = 0;
 
-    LCD_Clear(WHITE);       /* 清屏 */
+    lcd_clear(WHITE);       /* 清屏 */
     lcd_show_string(40, 40, 160, 100, 16, TP_REMIND_MSG_TBL, RED); /* 显示提示信息 */
     tp_draw_touch_point(20, 20, RED);   /* 画点1 */
     tp_dev.sta = 0;         /* 消除触发信号 */
@@ -447,7 +448,7 @@ void tp_adjust(void)
                     break;
 
                 case 4:
-                    LCD_Clear(WHITE);   /* 画第五个点了, 直接清屏 */
+                    lcd_clear(WHITE);   /* 画第五个点了, 直接清屏 */
                     tp_draw_touch_point(lcddev.width / 2, lcddev.height / 2, RED);  /* 画点5 */
                     break;
 
@@ -481,17 +482,17 @@ void tp_adjust(void)
                     tp_dev.xc = pxy[4][0];      /* X轴,物理中心坐标 */
                     tp_dev.yc = pxy[4][1];      /* Y轴,物理中心坐标 */
 
-                    LCD_Clear(WHITE);   /* 清屏 */
+                    lcd_clear(WHITE);   /* 清屏 */
                     lcd_show_string(35, 110, lcddev.width, lcddev.height, 16, "Touch Screen Adjust OK!", BLUE); /* 校正完成 */
-                    HAL_Delay(1);
+                    delay_ms(1000);
                     tp_save_adjust_data();
 
-                    LCD_Clear(WHITE);/* 清屏 */
+                    lcd_clear(WHITE);/* 清屏 */
                     return;/* 校正完成 */
             }
         }
 
-        tim_delay_us(&htim6,10);
+        delay_ms(10);
         outtime++;
 
         if (outtime > 1000)
@@ -511,14 +512,80 @@ void tp_adjust(void)
  */
 uint8_t tp_init(void)
 {
-   gt9xxx_init();
-   tp_dev.scan = gt9xxx_scan;      /* 扫描函数指向GT9147触摸屏扫描 */
- 
+//    GPIO_InitTypeDef gpio_init_struct;
+//    
+//    tp_dev.touchtype = 0;                   /* 默认设置(电阻屏 & 竖屏) */
+//    tp_dev.touchtype |= lcddev.dir & 0X01;  /* 根据LCD判定是横屏还是竖屏 */
 
-  
-  // tp_adjust();        /* 屏幕校准 */
+//    if (lcddev.id == 0X5510 || lcddev.id == 0X4342 || lcddev.id == 0X4384 || lcddev.id == 0X1018)  /* 电容触摸屏,4.3寸/10.1寸屏 */
+//    {
+        gt9xxx_init();
+        tp_dev.scan = gt9xxx_scan;      /* 扫描函数指向GT9147触摸屏扫描 */
+//        tp_dev.touchtype |= 0X80;       /* 电容屏 */
+//        return 0;
+//    }
+//    else if (lcddev.id == 0X1963 || lcddev.id == 0X7084 || lcddev.id == 0X7016)     /* SSD1963 7寸屏或者 7寸800*480/1024*600 RGB屏 */
+//    {
+//        if (!ft5206_init())             /* 触摸IC是FT系列的就执行ft5206_init函数以及使用ft5206_scan扫描函数 */
+//        {
+//            tp_dev.scan = ft5206_scan;  /* 扫描函数指向FT5206触摸屏扫描 */
+//        }
+//        else                            /* 触摸IC是GT系列的就执行gt9xxx_init函数以及使用gt9xxx_scan扫描函数 */
+//        {
+//            gt9xxx_init();
+//            tp_dev.scan = gt9xxx_scan;  /* 扫描函数指向GT9147触摸屏扫描 */
+        //}
+//        tp_dev.touchtype |= 0X80;       /* 电容屏 */
+        return 0;
+    }
+//    else
+//    {
+//        T_PEN_GPIO_CLK_ENABLE();    /* T_PEN脚时钟使能 */
+//        T_CS_GPIO_CLK_ENABLE();     /* T_CS脚时钟使能 */
+//        T_MISO_GPIO_CLK_ENABLE();   /* T_MISO脚时钟使能 */
+//        T_MOSI_GPIO_CLK_ENABLE();   /* T_MOSI脚时钟使能 */
+//        T_CLK_GPIO_CLK_ENABLE();    /* T_CLK脚时钟使能 */
 
-}
+//        gpio_init_struct.Pin = T_PEN_GPIO_PIN;
+//        gpio_init_struct.Mode = GPIO_MODE_INPUT;                 /* 输入 */
+//        gpio_init_struct.Pull = GPIO_PULLUP;                     /* 上拉 */
+//        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;           /* 高速 */
+//        HAL_GPIO_Init(T_PEN_GPIO_PORT, &gpio_init_struct);       /* 初始化T_PEN引脚 */
+
+//        gpio_init_struct.Pin = T_MISO_GPIO_PIN;
+//        HAL_GPIO_Init(T_MISO_GPIO_PORT, &gpio_init_struct);      /* 初始化T_MISO引脚 */
+
+//        gpio_init_struct.Pin = T_MOSI_GPIO_PIN;
+//        gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;             /* 推挽输出 */
+//        gpio_init_struct.Pull = GPIO_PULLUP;                     /* 上拉 */
+//        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;           /* 高速 */
+//        HAL_GPIO_Init(T_MOSI_GPIO_PORT, &gpio_init_struct);      /* 初始化T_MOSI引脚 */
+
+//        gpio_init_struct.Pin = T_CLK_GPIO_PIN;
+//        HAL_GPIO_Init(T_CLK_GPIO_PORT, &gpio_init_struct);       /* 初始化T_CLK引脚 */
+
+//        gpio_init_struct.Pin = T_CS_GPIO_PIN;
+//        HAL_GPIO_Init(T_CS_GPIO_PORT, &gpio_init_struct);        /* 初始化T_CS引脚 */
+
+//        tp_read_xy(&tp_dev.x[0], &tp_dev.y[0]); /* 第一次读取初始化 */
+////        at24cxx_init();         /* 初始化24CXX */
+
+//        if (tp_get_adjust_data())
+//        {
+//            return 0;           /* 已经校准 */
+//        }
+//        else                    /* 未校准? */
+//        {
+//            lcd_clear(WHITE);   /* 清屏 */
+//            tp_adjust();        /* 屏幕校准 */
+//            tp_save_adjust_data();
+//        }
+
+//        tp_get_adjust_data();
+//    }
+
+//    return 1;
+//}
 
 
 

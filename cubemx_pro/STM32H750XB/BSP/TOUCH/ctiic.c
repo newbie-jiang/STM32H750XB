@@ -23,7 +23,7 @@
  */
  
 #include "ctiic.h"
-#include "tim.h"
+#include "delay.h"
 
 
 /**
@@ -33,7 +33,7 @@
  */
 static void ct_iic_delay(void)
 {
-    tim_delay_us(&htim6,10);
+    delay_us(2);
 }
 
 /**

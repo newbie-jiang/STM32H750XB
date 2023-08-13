@@ -1,13 +1,12 @@
 #include "paj7620u2_iic.h"
 #include "paj7620u2.h"
 #include "stdio.h"
-#include "delay.h"
 
-//void delay_us(uint16_t us)
-//{
-// static unsigned int i=0;
-// for ( i=0;i<us*14;++i);
-//}
+void paj_delay_us(uint16_t us)
+{
+ static unsigned int i=0;
+ for ( i=0;i<us*14;++i);
+}
 
 
 /**
@@ -55,9 +54,9 @@ static void GS_IIC_Start()
 	GS_SDA_OUT();//sda线输出
 	GS_IIC_SDA(1);	  	  
 	GS_IIC_SCL(1);
-	delay_us(4);
+	paj_delay_us(4);
 	GS_IIC_SDA(0);//START:when CLK is high,DATA change form high to low 
-	delay_us(4);
+	paj_delay_us(4);
 	GS_IIC_SCL(0);//钳住I2C总线，准备发送或接收数据 
 }
 
@@ -67,10 +66,10 @@ static void GS_IIC_Stop()
 	GS_SDA_OUT();//sda线输出
 	GS_IIC_SCL(0);
 	GS_IIC_SDA(0);//STOP:when CLK is high DATA change form low to high
-	delay_us(4);
+	paj_delay_us(4);
 	GS_IIC_SCL(1); 
 	GS_IIC_SDA(1);//发送I2C总线结束信号
-	delay_us(4);				   	
+	paj_delay_us(4);				   	
 }
 
 //等待应答信号到来
@@ -81,8 +80,8 @@ static uint8_t GS_IIC_Wait_Ack()
 	
 	uint8_t ucErrTime=0;
 	GS_SDA_IN();  //SDA设置为输入  
-	GS_IIC_SDA(1);delay_us(3);	   
-	GS_IIC_SCL(1);delay_us(3);	 
+	GS_IIC_SDA(1);paj_delay_us(3);	   
+	GS_IIC_SCL(1);paj_delay_us(3);	 
 	while(READ_SDA())
 	{
 		ucErrTime++;
@@ -102,9 +101,9 @@ static void GS_IIC_Ack()
 	GS_IIC_SCL(0);
 	GS_SDA_OUT();
 	GS_IIC_SDA(0);
-	delay_us(3);
+	paj_delay_us(3);
 	GS_IIC_SCL(1);
-	delay_us(3);
+	paj_delay_us(3);
 	GS_IIC_SCL(0);
 }
 
@@ -114,9 +113,9 @@ static void GS_IIC_NAck()
 	GS_IIC_SCL(0);
 	GS_SDA_OUT();
 	GS_IIC_SDA(1);
-	delay_us(2);
+	paj_delay_us(2);
 	GS_IIC_SCL(1);
-	delay_us(2);
+	paj_delay_us(2);
 	GS_IIC_SCL(0);
 }
 
@@ -137,12 +136,12 @@ static void GS_IIC_Send_Byte(uint8_t txd)
 			GS_IIC_SDA(0);
 		txd<<=1; 	
     
-		delay_us(5); 
+		paj_delay_us(5); 
    	
 		GS_IIC_SCL(1);
-		delay_us(5); 
+		paj_delay_us(5); 
 		GS_IIC_SCL(0);	
-		delay_us(5);
+		paj_delay_us(5);
 	}	 
 } 
 
@@ -156,11 +155,11 @@ static uint8_t GS_IIC_Read_Byte(uint8_t ack)
 	for(i=0;i<8;i++ )
 	{
 		GS_IIC_SCL(0); 
-		delay_us(4);
+		paj_delay_us(4);
 		GS_IIC_SCL(1);
 		receive<<=1;
 		if(READ_SDA())receive++;   
-		delay_us(4); 
+		paj_delay_us(4); 
 	}					 
 	if (!ack)
 		GS_IIC_NAck();//发送nACK
@@ -248,8 +247,10 @@ uint8_t GS_Read_nByte(uint8_t REG_Address,uint16_t len,uint8_t *buf)
 //PAJ7620唤醒
 void GS_WakeUp()
 {
+	//printf("test3\r\n");
 	GS_IIC_Start();
 	GS_IIC_Send_Byte(PAJ7620_ID);//发写命令
+	//printf("test4\r\n");
 	GS_IIC_Stop();//释放总线
 }
 

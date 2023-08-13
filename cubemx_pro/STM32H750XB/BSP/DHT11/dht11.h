@@ -1,5 +1,5 @@
-#ifndef __DS18B20_H
-#define __DS18B20_H
+#ifndef __DHT11_H
+#define __DHT11_H
 
 #include "stdint.h"
 
@@ -11,20 +11,13 @@ uint8_t READ_DHT11(void);
 
 
 
- 	
-
-//IO方向设置
-//#define DHT11_IO_IN()  {GPIOG->MODER&=~(3<<(9*2));GPIOG->MODER|=0<<(9*2);}	//PG9输入模式
-//#define DHT11_IO_OUT() {GPIOG->MODER&=~(3<<(9*2));GPIOG->MODER|=1<<(9*2);} 	//PG9输出模式
-
 #define DHT11_IO_IN()    dht11_IN()
 #define DHT11_IO_OUT()   dht11_OUT()
  
-////IO操作函数											   
-//#define	DHT11_DQ_OUT    PGout(9)//数据端口	PG9
+
 #define DHT11_DQ_OUT(n)    ((n)>0 ? HAL_GPIO_WritePin(DHT11_GPIO_Port, DHT11_Pin, GPIO_PIN_SET)\
                                   : HAL_GPIO_WritePin(DHT11_GPIO_Port, DHT11_Pin, GPIO_PIN_RESET))//DHT11_OUT 
-//#define	DHT11_DQ_IN     READ_DHT11() //数据端口	PG9 
+
 
 
 

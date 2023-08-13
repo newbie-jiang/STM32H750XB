@@ -28,7 +28,7 @@
 #include "stdio.h"
 #include "usart.h"
 #include "irda_nec.h"
-
+#include "lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,7 +43,8 @@
  bool isValueChanged = false;  // 标记变量是否改变
  bool nec_ValueChanged = false;  // 标记变量是否改变
  
-
+bool GPIO_TS_IIC_INT_Pin_state = false;
+uint8_t irda_code_flag;
 
 uint32_t IC_TIMES;  // 捕获次数，单位1ms
 uint8_t IC_START_FLAG;  // 捕获开始标志，1：已捕获到高电平；0：还没有捕获到高电平
@@ -79,8 +80,8 @@ uint16_t IC_VALUE;  // 输入捕获的捕获值
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
 extern LTDC_HandleTypeDef hltdc;
-extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim5;
+extern DMA_HandleTypeDef hdma_uart4_tx;
 extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
@@ -254,31 +255,31 @@ void EXTI4_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM2 global interrupt.
+  * @brief This function handles DMA1 stream0 global interrupt.
   */
-void TIM2_IRQHandler(void)
+void DMA1_Stream0_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM2_IRQn 0 */
-static uint32_t CurrentCapture=0;
-static uint8_t  Is_First_Captured = 0;  // 0= not captured, 1= captured
-static uint8_t sampling_count;
-	sampling_count++;
-  /* USER CODE END TIM2_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim2);
-  /* USER CODE BEGIN TIM2_IRQn 1 */
-	
-    
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
 
-		
-		
-  
-	
-//	printf("Period=%d\r\n",Period);
-//	     printf("DutyCycle=%d\r\n",DutyCycle);
-//	
-	
-  //HAL_GPIO_TogglePin(PB2_GPIO_Port, PB2_Pin);
-  /* USER CODE END TIM2_IRQn 1 */
+  /* USER CODE END DMA1_Stream0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_uart4_tx);
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream0_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line[15:10] interrupts.
+  */
+void EXTI15_10_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_TS_IIC_INT_Pin);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+
+  /* USER CODE END EXTI15_10_IRQn 1 */
 }
 
 /**
@@ -299,7 +300,24 @@ void TIM5_IRQHandler(void)
 	uint32_t code=IC_IRDA_NEC();
 	if(code!=0x00)
 	{
-	 printf("%08x\r\n",code);
+	  printf("irda_code:%08x\r\n",code);
+		if(code==0x00ff22dd)
+		{
+		  lcd_clear(WHITE);
+		}else if(code==0x00ff30cf)
+		{
+			irda_code_flag=1;
+		}
+	  else if(code==0x00ff18e7){
+			
+		  irda_code_flag=2;
+		
+	}
+		
+		
+		
+		
+		
 	}
   /* USER CODE END TIM5_IRQn 1 */
 }
@@ -414,37 +432,39 @@ uint16_t get_irda_tim(void)
 
 
 
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	/*用户按键中断*/
-  if(GPIO_Pin==USER_KEY_Pin)
+	static uint16_t get_new_tim; /*获取最新时间*/
+	static uint16_t get_old_tim; /*获取上次时间*/
+	static uint16_t think_tim;/*间隔时间*/
+	
+  if(GPIO_Pin==GPIO_TS_IIC_INT_Pin)
 	 {
-	  buttonPressTime = HAL_GetTick();
-	 }
+		 get_new_tim=HAL_GetTick();
+		 /**************向上溢出，考虑溢出情况**************************/	
+		if(get_new_tim > get_old_tim) 
+			think_tim = get_new_tim - get_old_tim;          /*无溢出*/
+		else   
+			think_tim = get_new_tim + 65535 - get_old_tim;    /*溢出*/
+		
+		get_old_tim = get_new_tim;
+    /***************************************************************/
+      /*检测中断时间为10ms GPIO_TS_IIC_INT_Pin_state=true*/
+		
+		if(think_tim>=7&&think_tim<=13)
+		{
+			ctp_test();
+		 //GPIO_TS_IIC_INT_Pin_state=true;
+		 //HAL_GPIO_TogglePin(GPIOB, PB2_Pin);
+		}
+		
+	}
 	 
-	 /*红外接收中断*/
-//	 if(GPIO_Pin==IRDA_Pin)
+//	if(GPIO_Pin==USER_KEY_Pin)
 //	{
-//		 //LED_R_ON;
-//		
-//		 /*开启定时器计数*/
-//		 HAL_TIM_Base_Start_IT(&htim6);
-//		 /*关闭定时器计数*/
-//		 //HAL_TIM_Base_Stop(&htim6);
-//		
-//		
-//		 isValueChanged=true;
-//		
-//		 
+//	  key_process();
 //	}
-	 
-	 if(GPIO_Pin==WIFI_REG_ON_Pin)
-	 {
-	  /*上升沿wifi唤醒状态*/
-		 
-		 
-		 
-	 }
 
 
 }

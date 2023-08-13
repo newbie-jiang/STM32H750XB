@@ -298,7 +298,6 @@ uint8_t BSP_W25Qx_Erase_Chip(void)
 
 
 
-
 void w25q128_test(void)
 {
 	static uint8_t wData[0x100];
@@ -411,5 +410,3 @@ void w25q128_test(void)
 
 
 }
-
-

@@ -2,216 +2,247 @@
 #include "quadspi.h"
 
 
+extern QSPI_HandleTypeDef hqspi;
+QSPI_HandleTypeDef g_qspi_handle;    /* QSPI句柄 */
 
 /**
- * @brief		向SPI Flash发送指令
- * @param		instruction —— 要发送的指令
- * @param		address     —— 要发送的地址
- * @param		dummyCycles	—— 空指令周期数
- * @param		instructionMode —— 指令发送模式
- * @param		addressMode —— 地址发送模式
- * @param		addressSize	—— 地址大小
- * @param		dataMode    —— 数据发送模式
- * @retval	    成功返回HAL_OK
-*/
-HAL_StatusTypeDef QSPI_Send_Command(uint32_t instruction, 
-									uint32_t address, 
-									uint32_t dummyCycles, 
-									uint32_t instructionMode, 
-									uint32_t addressMode, 
-									uint32_t addressSize, 
-									uint32_t dataMode)
+ * @brief       等待状态标志
+ * @param       flag : 需要等待的标志位
+ * @param       sta  : 需要等待的状态
+ * @param       wtime: 等待时间
+ * @retval      0, 等待成功; 1, 等待失败.
+ */
+uint8_t qspi_wait_flag(uint32_t flag, uint8_t sta, uint32_t wtime)
 {
-    QSPI_CommandTypeDef cmd;
+    uint8_t flagsta = 0;
 
-    cmd.Instruction = instruction;                 	//指令
-    cmd.Address = address;                          //地址
-    cmd.DummyCycles = dummyCycles;                  //设置空指令周期数
-    cmd.InstructionMode = instructionMode;			//指令模式
-    cmd.AddressMode = addressMode;   				//地址模式
-    cmd.AddressSize = addressSize;   				//地址长度
-    cmd.DataMode = dataMode;             			//数据模式
-    cmd.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;       	//每次都发送指令
-    cmd.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE; //无交替字节
-    cmd.DdrMode = QSPI_DDR_MODE_DISABLE;           	//关闭DDR模式
-    cmd.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
+    while (wtime)
+    {
+        flagsta = (QUADSPI->SR & flag) ? 1 : 0;     /* 获取状态标志 */
+
+        if (flagsta == sta)
+        {
+            wtime--;
+        }
+        break;
+    }
+
+    if (wtime)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+/**
+ * @brief       初始化QSPI接口
+ * @param       无
+ * @retval      0, 成功; 1, 失败.
+ */
+//uint8_t qspi_init(void)
+//{
+//    g_qspi_handle.Instance                  = QUADSPI;                          /* QSPI */
+//    g_qspi_handle.Init.ClockPrescaler       = 1;                                /* QSPI分频比，BY25Q128最大频率为108M，
+//                                                                                   所以此处应该为2，QSPI频率就为220/(1+1)=110MHZ
+//                                                                                   稍微有点超频，可以正常就好，不行就只能降低频率 */
+//    g_qspi_handle.Init.FifoThreshold        = 4;                                /* FIFO阈值为4个字节 */
+//    g_qspi_handle.Init.SampleShifting       = QSPI_SAMPLE_SHIFTING_HALFCYCLE;   /* 采样移位半个周期(DDR模式下,必须设置为0) */
+//    g_qspi_handle.Init.FlashSize            = 25 - 1;                           /* SPI FLASH大小，BY25Q128大小为32M字节,2^25，所以取权值25 - 1 = 24 */
+//    g_qspi_handle.Init.ChipSelectHighTime   = QSPI_CS_HIGH_TIME_3_CYCLE;        /* 片选高电平时间为3个时钟(9.1 * 3 = 27.3ns),即手册里面的tSHSL参数 */
+//    g_qspi_handle.Init.ClockMode            = QSPI_CLOCK_MODE_3;                /* 模式3 */
+//    g_qspi_handle.Init.FlashID              = QSPI_FLASH_ID_1;                  /* 第一片flash */
+//    g_qspi_handle.Init.DualFlash            = QSPI_DUALFLASH_DISABLE;           /* 禁止双闪存模式 */
+
+//    if (HAL_QSPI_Init(&g_qspi_handle) == HAL_OK)
+//    {
+//        return 0;      /* QSPI初始化成功 */
+//    }
+//    else
+//    {
+//        return 1;
+//    }
+//}
+
+/**
+ * @brief       QSPI底层驱动,引脚配置，时钟使能
+ * @param       hqspi:QSPI句柄
+ * @note        此函数会被HAL_QSPI_Init()调用
+ * @retval      0, 成功; 1, 失败.
+ */
+//void HAL_QSPI_MspInit(QSPI_HandleTypeDef *hqspi)
+//{
+//    GPIO_InitTypeDef gpio_init_struct;
+
+//    __HAL_RCC_QSPI_CLK_ENABLE();      /* 使能QSPI时钟 */
+//    __HAL_RCC_GPIOB_CLK_ENABLE();     /* GPIOB时钟使能 */
+//    __HAL_RCC_GPIOD_CLK_ENABLE();     /* GPIOD时钟使能 */
+//    __HAL_RCC_GPIOE_CLK_ENABLE();     /* GPIOE时钟使能 */
+
+//    gpio_init_struct.Pin = QSPI_BK1_NCS_GPIO_PIN;
+//    gpio_init_struct.Mode = GPIO_MODE_AF_PP;                     /* 复用 */
+//    gpio_init_struct.Pull = GPIO_PULLUP;                         /* 上拉 */
+//    gpio_init_struct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;          /* 高速 */
+//    gpio_init_struct.Alternate = GPIO_AF10_QUADSPI;              /* 复用为QSPI */
+//    HAL_GPIO_Init(QSPI_BK1_NCS_GPIO_PORT, &gpio_init_struct);    /* 初始化QSPI_BK1_NCS引脚 */
+
+//    gpio_init_struct.Pin = QSPI_BK1_CLK_GPIO_PIN;
+//    gpio_init_struct.Mode = GPIO_MODE_AF_PP;                     /* 复用 */
+//    gpio_init_struct.Pull = GPIO_PULLUP;                         /* 上拉 */
+//    gpio_init_struct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;          /* 高速 */
+//    gpio_init_struct.Alternate = GPIO_AF9_QUADSPI;               /* 复用为QSPI */
+//    HAL_GPIO_Init(QSPI_BK1_CLK_GPIO_PORT, &gpio_init_struct);    /* 初始化QSPI_BK1_CLK引脚 */
+
+//    gpio_init_struct.Pin = QSPI_BK1_IO0_GPIO_PIN;
+//    HAL_GPIO_Init(QSPI_BK1_IO0_GPIO_PORT, &gpio_init_struct);    /* 初始化QSPI_BK1_IO0引脚 */
+
+//    gpio_init_struct.Pin = QSPI_BK1_IO1_GPIO_PIN;
+//    HAL_GPIO_Init(QSPI_BK1_IO1_GPIO_PORT, &gpio_init_struct);    /* 初始化QSPI_BK1_IO1引脚 */
+
+//    gpio_init_struct.Pin = QSPI_BK1_IO2_GPIO_PIN;
+//    HAL_GPIO_Init(QSPI_BK1_IO2_GPIO_PORT, &gpio_init_struct);    /* 初始化QSPI_BK1_IO2引脚 */
+
+//    gpio_init_struct.Pin = QSPI_BK1_IO3_GPIO_PIN;
+//    HAL_GPIO_Init(QSPI_BK1_IO3_GPIO_PORT, &gpio_init_struct);    /* 初始化QSPI_BK1_IO3引脚 */
+//}
+
+/**
+ * @brief       QSPI发送命令
+ * @param       cmd : 要发送的指令
+ * @param       addr: 发送到的目的地址
+ * @param       mode: 模式,详细位定义如下:
+ *   @arg       mode[1:0]: 指令模式; 00,无指令;  01,单线传输指令; 10,双线传输指令; 11,四线传输指令.
+ *   @arg       mode[3:2]: 地址模式; 00,无地址;  01,单线传输地址; 10,双线传输地址; 11,四线传输地址.
+ *   @arg       mode[5:4]: 地址长度; 00,8位地址; 01,16位地址;     10,24位地址;     11,32位地址.
+ *   @arg       mode[7:6]: 数据模式; 00,无数据;  01,单线传输数据; 10,双线传输数据; 11,四线传输数据.
+ * @param       dmcycle: 空指令周期数
+ * @retval      无
+ */
+void qspi_send_cmd(uint8_t cmd, uint32_t addr, uint8_t mode, uint8_t dmcycle)
+{
+    QSPI_CommandTypeDef qspi_command_init;
     
-	return HAL_QSPI_Command(&hqspi, &cmd, 5000);
-}
+    qspi_command_init.SIOOMode            = QSPI_SIOO_INST_EVERY_CMD;     /* 每次都发送指令 */
+    qspi_command_init.DdrMode             = QSPI_DDR_MODE_DISABLE;        /* 关闭DDR模式,使用SDR模式 */
+    qspi_command_init.DdrHoldHalfCycle    = QSPI_DDR_HHC_ANALOG_DELAY;    /* DDR模式下，用于设置延迟半个时钟周期再数据输出 */
 
-
-
-/**
-* @brief    QSPI发送指定长度的数据
-* @param    buf  —— 发送数据缓冲区首地址
-* @param    size —— 要发送数据的字节数
- * @retval	成功返回HAL_OK
- */
-HAL_StatusTypeDef QSPI_Transmit(uint8_t* send_buf, uint32_t size)
-{
-    hqspi.Instance->DLR = size - 1;                         //配置数据长度
-    return HAL_QSPI_Transmit(&hqspi, send_buf, 5000);	    //接收数据
-}
-
-
-/**
- * @brief	  QSPI接收指定长度的数据
- * @param   buf  —— 接收数据缓冲区首地址
- * @param   size —— 要接收数据的字节数
- * @retval	成功返回HAL_OK
- */
-HAL_StatusTypeDef QSPI_Receive(uint8_t* recv_buf, uint32_t size)
-{
-    hqspi.Instance->DLR = size - 1;                       //配置数据长度
-    return HAL_QSPI_Receive(&hqspi, recv_buf, 5000);			//接收数据
-}
-
-
-/**
- * @brief   读取Flash内部的ID
- * @param   none
- * @retval	成功返回device_id
- */
-uint16_t W25QXX_ReadID(void)
-{
-	uint8_t recv_buf[2] = {0};	//recv_buf[0]存放Manufacture ID, recv_buf[1]存放Device ID
-	uint16_t device_id = 0;
-	if(HAL_OK == QSPI_Send_Command(ManufactDeviceID_CMD, 0, 0, QSPI_INSTRUCTION_1_LINE, QSPI_ADDRESS_1_LINE, QSPI_ADDRESS_24_BITS, QSPI_DATA_1_LINE))
-	{
-        //读取ID
-        if(HAL_OK == QSPI_Receive(recv_buf, 2))
-        {
-            device_id = (recv_buf[0] << 8) | recv_buf[1];
-            return device_id;
-        }
-        else
-        {
-            return 0;
-        }
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-
-
-
-
-/**
- * @brief	读取SPI FLASH数据
- * @param   dat_buffer —— 数据存储区
- * @param   start_read_addr —— 开始读取的地址(最大32bit)
- * @param   byte_to_read —— 要读取的字节数(最大65535)
- * @retval  none
- */
-void W25QXX_Read(uint8_t* dat_buffer, uint32_t start_read_addr, uint16_t byte_to_read)
-{
-	QSPI_Send_Command(READ_DATA_CMD, start_read_addr, 0, QSPI_INSTRUCTION_1_LINE, QSPI_ADDRESS_1_LINE, QSPI_ADDRESS_24_BITS, QSPI_DATA_1_LINE);
-    QSPI_Receive(dat_buffer, byte_to_read);
-}
-
-
-
-
-
-/**
- * @brief	读取W25QXX的状态寄存器，W25Q64一共有2个状态寄存器
- * @param 	reg  —— 状态寄存器编号(1~2)
- * @retval	状态寄存器的值
- */
-uint8_t W25QXX_ReadSR(uint8_t reg)
-{
-	uint8_t cmd = 0, result = 0;	
-	switch(reg)
-	{
-		case 1:
-			/* 读取状态寄存器1的值 */
-			cmd = READ_STATU_REGISTER_1;
-		case 2:
-			cmd = READ_STATU_REGISTER_2;
-		case 0:
-		default:
-			cmd = READ_STATU_REGISTER_1;
-	}
-	QSPI_Send_Command(cmd, 0, 0, QSPI_INSTRUCTION_1_LINE, QSPI_ADDRESS_NONE, QSPI_ADDRESS_24_BITS, QSPI_DATA_1_LINE);
-	QSPI_Receive(&result, 1);
-	
-	return result;
-}
-
-
-
-
-/**
- * @brief	阻塞等待Flash处于空闲状态
- * @param   none
- * @retval  none
- */
-void W25QXX_Wait_Busy(void)
-{
-    while((W25QXX_ReadSR(1) & 0x01) == 0x01); // 等待BUSY位清空
-}
-
-
-
-
-/**
- * @brief	W25QXX写使能,将S1寄存器的WEL置位
- * @param	none
- * @retval
- */
-void W25QXX_Write_Enable(void)
-{
-    QSPI_Send_Command(WRITE_ENABLE_CMD, 0, 0, QSPI_INSTRUCTION_1_LINE, QSPI_ADDRESS_NONE, QSPI_ADDRESS_8_BITS, QSPI_DATA_NONE);
-		W25QXX_Wait_Busy();
+    /* 指令阶段 */
+    qspi_command_init.Instruction         = cmd;                          /* 要发送的指令 */
+    /* 设置指令阶段需要几线模式 */
+    if (((mode >> 0) & 0x03) == 0)
+        qspi_command_init.InstructionMode = QSPI_INSTRUCTION_NONE;        /* 不需要指令阶段 */
+    if (((mode >> 0) & 0x03) == 1)
+        qspi_command_init.InstructionMode = QSPI_INSTRUCTION_1_LINE;      /* 单线模式 */
+    if (((mode >> 0) & 0x03) == 2)
+        qspi_command_init.InstructionMode = QSPI_INSTRUCTION_2_LINES;     /* 双线模式 */
+    if (((mode >> 0) & 0x03) == 3)
+        qspi_command_init.InstructionMode = QSPI_INSTRUCTION_4_LINES;     /* 四线模式 */
+        
+    /* 地址阶段 */
+    qspi_command_init.Address             = addr;                         /* 要发送的地址 */
+    /* 设置地址长度 */
+    if (((mode >> 4) & 0x03) == 0)
+        qspi_command_init.AddressSize     = QSPI_ADDRESS_8_BITS;          /* 8位地址 */
+    if (((mode >> 4) & 0x03) == 1)
+        qspi_command_init.AddressSize     = QSPI_ADDRESS_16_BITS;         /* 16位地址 */
+    if (((mode >> 4) & 0x03) == 2)
+        qspi_command_init.AddressSize     = QSPI_ADDRESS_24_BITS;         /* 24位地址 */
+    if (((mode >> 4) & 0x03) == 3)
+        qspi_command_init.AddressSize     = QSPI_ADDRESS_32_BITS;         /* 32位地址 */
+    /* 设置地址阶段需要几线模式 */
+    if (((mode >> 2) & 0x03) == 0)
+        qspi_command_init.AddressMode     = QSPI_ADDRESS_NONE;            /* 不需要地址阶段 */
+    if (((mode >> 2) & 0x03) == 1)
+        qspi_command_init.AddressMode     = QSPI_ADDRESS_1_LINE;          /* 单线模式 */
+    if (((mode >> 2) & 0x03) == 2)
+        qspi_command_init.AddressMode     = QSPI_ADDRESS_2_LINES;         /* 双线模式 */
+    if (((mode >> 2) & 0x03) == 3)
+        qspi_command_init.AddressMode     = QSPI_ADDRESS_4_LINES;         /* 四线模式 */
+    
+    /* 交替字节阶段 */
+    qspi_command_init.AlternateBytes      = 0;                            /* 交替字节内容 */
+    qspi_command_init.AlternateBytesSize  = QSPI_ALTERNATE_BYTES_8_BITS;  /* 交替字节长度 */
+    qspi_command_init.AlternateByteMode   = QSPI_ALTERNATE_BYTES_NONE;    /* 交替字节阶段需要几线模式 */
+    
+    /* 空指令周期阶段 */
+    qspi_command_init.DummyCycles         = dmcycle;                      /* 空指令周期数 */
+    
+    /* 数据阶段 */
+    /* 不设置NbData成员，在qspi_transmit/receive函数中指定 */
+//    qspi_command_init.NbData              = ;                           /* 数据长度 */
+    /* 设置数据阶段需要几线模式 */
+    if (((mode >> 6) & 0x03) == 0)
+        qspi_command_init.DataMode        = QSPI_DATA_NONE;               /* 不需要数据阶段 */
+    if (((mode >> 6) & 0x03) == 1)
+        qspi_command_init.DataMode        = QSPI_DATA_1_LINE;             /* 单线模式 */
+    if (((mode >> 6) & 0x03) == 2)
+        qspi_command_init.DataMode        = QSPI_DATA_2_LINES;            /* 双线模式 */
+    if (((mode >> 6) & 0x03) == 3)
+        qspi_command_init.DataMode        = QSPI_DATA_4_LINES;            /* 四线模式 */
+        
+    HAL_QSPI_Command(&g_qspi_handle, &qspi_command_init, 5000);           /* 用于向QSPI FLASH发送命令 */
 }
 
 /**
- * @brief	W25QXX写禁止,将WEL清零
- * @param	none
- * @retval	none
+ * @brief       QSPI发送指定长度的数据
+ * @param       buf     : 发送数据缓冲区首地址
+ * @param       datalen : 要传输的数据长度
+ * @retval      0, 成功; 其他, 错误代码
  */
-void W25QXX_Write_Disable(void)
+uint8_t qspi_transmit(uint8_t *buf, uint32_t datalen)
 {
-    QSPI_Send_Command(WRITE_DISABLE_CMD, 0, 0, QSPI_INSTRUCTION_1_LINE, QSPI_ADDRESS_NONE, QSPI_ADDRESS_8_BITS, QSPI_DATA_NONE);
-		W25QXX_Wait_Busy();
+    g_qspi_handle.Instance->DLR = datalen - 1;  /* 直接使用寄存器赋值的方式设置要发送的数据字节数 */
+    
+    if (HAL_QSPI_Transmit(&g_qspi_handle, buf, 5000) == HAL_OK)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
-
 
 
 /**
- * @brief	W25QXX擦除一个扇区
- * @param   sector_addr	—— 扇区地址 根据实际容量设置
- * @retval  none
- * @note	阻塞操作
+ * @brief       QSPI接收指定长度的数据
+ * @param       buf     : 接收数据缓冲区首地址
+ * @param       datalen : 要传输的数据长度
+ * @retval      0, 成功; 其他, 错误代码.
  */
-void W25QXX_Erase_Sector(uint32_t sector_addr)
+uint8_t qspi_receive(uint8_t *buf, uint32_t datalen)
 {
-    sector_addr *= 4096;	//每个块有16个扇区，每个扇区的大小是4KB，需要换算为实际地址
-    W25QXX_Write_Enable();  //擦除操作即写入0xFF，需要开启写使能
-    W25QXX_Wait_Busy();		//等待写使能完成
-    QSPI_Send_Command(SECTOR_ERASE_CMD, sector_addr, 0, QSPI_INSTRUCTION_1_LINE, QSPI_ADDRESS_1_LINE, QSPI_ADDRESS_24_BITS, QSPI_DATA_NONE);
-    W25QXX_Wait_Busy();   	//等待扇区擦除完成
+    g_qspi_handle.Instance->DLR = datalen - 1;  /* 直接使用寄存器赋值的方式设置要发送的数据字节数 */
+
+    if (HAL_QSPI_Receive(&g_qspi_handle, buf, 5000) == HAL_OK)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 
 
-/**
- * @brief	页写入操作
- * @param	dat —— 要写入的数据缓冲区首地址
- * @param	WriteAddr —— 要写入的地址
- * @param   byte_to_write —— 要写入的字节数（0-256）
- * @retval	none
- */
-void W25QXX_Page_Program(uint8_t* dat, uint32_t WriteAddr, uint16_t byte_to_write)
-{
-	W25QXX_Write_Enable();
-	QSPI_Send_Command(PAGE_PROGRAM_CMD, WriteAddr, 0, QSPI_INSTRUCTION_1_LINE, QSPI_ADDRESS_1_LINE, QSPI_ADDRESS_24_BITS, QSPI_DATA_1_LINE);
-	QSPI_Transmit(dat, byte_to_write);
-    W25QXX_Wait_Busy();
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

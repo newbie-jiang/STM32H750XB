@@ -23,13 +23,13 @@
  */
 
 #include "string.h"
-#include "lcd.h"
-#include "touch.h"
-#include "ctiic.h"
-#include "ft5206.h"
-#include "usart.h"
-#include "tim.h"
-#include "stdio.h"
+#include "./BSP/LCD/lcd.h"
+#include "./BSP/TOUCH/touch.h"
+#include "./BSP/TOUCH/ctiic.h"
+#include "./BSP/TOUCH/ft5206.h"
+#include "./SYSTEM/usart/usart.h"
+#include "./SYSTEM/delay/delay.h"
+
 
 /**
  * @brief       向FT5206写入一次数据
@@ -114,9 +114,9 @@ uint8_t ft5206_init(void)
 
     ct_iic_init();      /* 初始化电容屏的I2C总线 */
     FT5206_RST(0);      /* 复位 */
-    tim_delay_us(&htim6,20);
+    delay_ms(20);
     FT5206_RST(1);      /* 释放复位 */
-    tim_delay_us(&htim6,50);
+    delay_ms(50);
     
     temp[0] = 0;
     ft5206_wr_reg(FT5206_DEVIDE_MODE, temp, 1);     /* 进入正常操作模式 */
@@ -168,7 +168,7 @@ uint8_t ft5206_scan(uint8_t mode)
             temp = 0XFFFF << (sta & 0XF);           /* 将点的个数转换为1的位数,匹配tp_dev.sta定义 */
             tp_dev.sta = (~temp) | TP_PRES_DOWN | TP_CATH_PRES;
 
-            tim_delay_us(&htim6,4);   /* 必要的延时，否则老是认为有按键按下 */
+            delay_ms(4);    /* 必要的延时，否则老是认为有按键按下 */
             
             for (i = 0; i < 5; i++)
             {
