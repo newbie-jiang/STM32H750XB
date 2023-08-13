@@ -385,16 +385,16 @@ void readInternalVoltage(void)
 	uint16_t TS_CAL2;
 	uint16_t VREFINT_CAL;
 	
-  float value[3];
+  uint16_t value[3];
   TS_CAL1 = *(__IO uint16_t *)(0x1FF1E820); 
 	TS_CAL2 = *(__IO uint16_t *)(0x1FF1E840); 
 	VREFINT_CAL = *(__IO uint16_t *)(0x1FF1E860UL); 
  
    for(int i=0;i<=2;i++)  
 	{
-		  HAL_ADC_Start(&hadc3);
+		  HAL_ADC_Start_DMA(&hadc3,(uint32_t*)value,3);
       value[i] = HAL_ADC_GetValue(&hadc3);
-	    printf("ADC value[%d]=%f\r\n",i,value[i]);
+	    printf("ADC value[%d]=%d\r\n",i,value[i]);
 		
 		if(i==0)/*µçÎ»Æ÷µçÑ¹*/
 		{

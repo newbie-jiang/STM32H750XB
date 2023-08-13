@@ -76,6 +76,8 @@ void TIM5_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void LTDC_IRQHandler(void);
 void OTG_FS_IRQHandler(void);
+void DMAMUX2_OVR_IRQHandler(void);
+void BDMA_Channel0_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
