@@ -468,6 +468,43 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 }
 
 
+/*********************串口数据解析***********************************/
+uint8_t rx_data;
+uint8_t rx_buffer[128];
+uint32_t rx_index = 0;
+
+//{"LED":"ON"} or {"LED":"OFF"}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == UART4) 
+    {
+        // Add received byte to the buffer
+        rx_buffer[rx_index++] = rx_data;
+
+        // Check if received a complete JSON message e.g., {"LED":"ON"} or {"LED":"OFF"}
+        if (rx_data == '}' && rx_index < sizeof(rx_buffer)) 
+        {
+            rx_buffer[rx_index] = '\0';  // Null terminate the string
+            if (strstr((char *)rx_buffer, "{\"LED\":\"ON\"}")) 
+            {
+               HAL_GPIO_WritePin(GPIOC, LED_R_Pin, GPIO_PIN_RESET);
+            } 
+            else if (strstr((char *)rx_buffer, "{\"LED\":\"OFF\"}")) 
+            {
+               HAL_GPIO_WritePin(GPIOC, LED_R_Pin, GPIO_PIN_SET);
+            }
+						HAL_UART_Transmit_IT(&huart4,(uint8_t*)rx_buffer,sizeof(rx_buffer));
+						
+            rx_index = 0; // Reset the buffer index
+        }
+
+        // Restart interrupt for next byte
+        HAL_UART_Receive_IT(&huart4, &rx_data, 1);
+    }
+}
+
+
+
 
 
 
@@ -516,7 +553,8 @@ void bsp_init(void)
 	//testDrawXBM(&u8g2);
   //u8g2DrawTest(&u8g2);
 	
-	
+	HAL_UART_Receive_IT(&huart4, &rx_data, 1);
+
 
 	
 	

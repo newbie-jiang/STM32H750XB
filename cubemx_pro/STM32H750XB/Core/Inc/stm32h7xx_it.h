@@ -70,13 +70,13 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 void EXTI3_IRQHandler(void);
 void EXTI4_IRQHandler(void);
-void DMA1_Stream0_IRQHandler(void);
+void USART1_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 void TIM5_IRQHandler(void);
+void UART4_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void LTDC_IRQHandler(void);
 void OTG_FS_IRQHandler(void);
-void DMAMUX2_OVR_IRQHandler(void);
 void BDMA_Channel0_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
