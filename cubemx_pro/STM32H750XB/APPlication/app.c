@@ -18,8 +18,9 @@
 #include "w25qxx.h"
 #include "w25q64jv.h"
 #include "display.h"
-
-
+#include "fatfs.h"
+#include "ff.h"
+#include "config.h"
 
  uint32_t rawValue;
 //  n  
@@ -458,20 +459,89 @@ void adc_Calibration(void)
 }
 
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	
-	
-  printf("05%d",rawValue);
 
 
+
+
+
+
+/************************雷达数据解析*******************************/
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == UART4) {  
+        // 当数据发送完毕后，此部分代码会执行
+        // 您可以在此处添加代码，例如灭掉一个LED或设置一个标志
+			
+    }
+		
+		if (huart->Instance == USART1) {  
+        // 当数据发送完毕后，此部分代码会执行
+        // 您可以在此处添加代码，例如灭掉一个LED或设置一个标志
+			
+    }
 }
 
 
-/*********************串口数据解析***********************************/
+/************************雷达发送数据*******************************/
+static void initUartPacket(UartPacket* packet) {
+    packet->header[0] = 0x55; /*数据头*/
+    packet->header[1] = 0x5A;
+    packet->tail = 0xFE;/*数据尾*/
+}
+
+static void setPacketContent(UartPacket* packet, uint8_t command, uint16_t data) {
+    packet->command = command; /*命令*/
+	  packet->data_high = (data >> 8) & 0xFF; /*发送数据高位*/
+    packet->data_low = data & 0xFF;/*发送数据低位*/
+    packet->checksum = command ^ packet->data_high ^ packet->data_low; // 计算校验和
+}
+
+static void sendUartPacket(UART_HandleTypeDef* huart, UartPacket* packet) {
+    HAL_UART_Transmit(huart, (uint8_t*)packet, sizeof(UartPacket), HAL_MAX_DELAY);
+}
+
+
+
+/*支持命令如下
+0x09   打开关闭雷达       0x0001打开  0x0000关闭
+0x89   读取雷达开关状态
+0x01   写入距离等级       0x0000  ---  0x000F(15) 0距离最大
+0x81   读取距离等级 
+0x02   写入延迟时间       0x0000  ---  0xffff
+0x82   读取延迟时间       
+0x03   打开关闭光感       0x0001打开   0x0000关闭  
+0x83   读取光感开关
+0x06   设置封锁时间       0x0000  ---  0xffff    
+
+封锁时间，也称保护时间，当雷达 OUT 引脚由高变低之后，即感应输出
+结束后，接下来会有一段时间停止检测，这段停止检测的时间被称为封锁时间，
+默认 1S(数值 0x03e8=1000ms),一般不作修改，如特殊需要修改，应设置不小于
+500ms
+*/
+UartPacket packet;
+void usart_radar_process(void)
+{
+  static uint8_t commandValue = 0x09;
+  static uint16_t dataValue = 0x0000;
+	
+  initUartPacket(&packet);
+  setPacketContent(&packet, commandValue, dataValue);
+  sendUartPacket(&huart1, &packet);
+}
+
+
+
+
+
+
+/*********************debug串口数据解析***********************************/
 uint8_t rx_data;
 uint8_t rx_buffer[128];
 uint32_t rx_index = 0;
+
+//UartPacket txPacket;  // 用于发送的数据包
+UartPacket rxPacket;  // 用于接收的数据包
+
 
 //{"LED":"ON"} or {"LED":"OFF"}
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -497,13 +567,333 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 						
             rx_index = 0; // Reset the buffer index
         }
+				
+				
 
         // Restart interrupt for next byte
         HAL_UART_Receive_IT(&huart4, &rx_data, 1);
+     }
+		
+//					if (huart->Instance == USART1) 
+//				{
+//		      // 如果接收缓冲区内容与发送的数据包相匹配
+//            if(memcmp(&packet, &rxPacket, sizeof(UartPacket)) == 0) 
+//            {
+//							/*数据匹配，写命令成功*/
+//                printf("radar write command ok !!!\r\n");
+//            }
+//            else 
+//            {
+//                // 数据不匹配，判断是否为查询操作
+//							   printf("radar write command ERR !!!\r\n");
+//            }
+//						
+//						HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxPacket, sizeof(UartPacket));
+//		    }
+		
+}
+/*******************************************************************************************************************/
+/*******************************************************************************************************************/
+/**************************************************SD卡操作函数*****************************************************/
+/*******************************************************************************************************************/
+/*******************************************************************************************************************/
+FIL file;      // 文件对象
+FRESULT fres;  // FatFs函数的返回类型
+FILINFO fno;
+FATFS fs;       // 文件系统对象
+
+
+
+/*************************挂载SD***************************************/
+void mount_sd(void)
+{
+	retSD = f_mount(&fs, SDPath, 1);
+	if(retSD)
+	{
+		   #ifdef  FATFS_DEBUG
+			   printf(" mount error : %d \r\n",retSD);
+			 #endif
+			
+			Error_Handler();
+	}
+	else
+			
+	     #ifdef  FATFS_DEBUG
+			   printf(" mount sucess!!! \r\n");
+			 #endif
+	
+}
+/*************************格式化SD卡***************************************/
+/*在调用f_mkfs之前，确保没有对目标驱动器进行挂载
+格式化之后，通常会卸载驱动器以确保所有的系统资源得到正确的释放*/
+
+//驱动器的最大扇区大小
+#define  FF_MAX_SS  512
+
+FRESULT mkfs_sdcard(void) {
+
+    BYTE work[FF_MAX_SS];  // Working buffer for f_mkfs
+
+    fres = f_mount(&fs, "", 0);  // 挂载设备
+    if (fres != FR_OK) {
+			#ifdef  FATFS_DEBUG
+			printf("ERR SD Mounting failed:%d\r\n",fres);
+			#endif
+			
+        return fres;  // 挂载错误
+    }
+
+    fres = f_mkfs("", FM_FAT32, 0, work, sizeof(work));  // Format as FAT32
+    if (fres != FR_OK) {
+			#ifdef  FATFS_DEBUG
+			printf("ERR SD Formatting failed:%d\r\n",fres);
+			#endif
+        return fres;  //格式化失败
+    }
+
+    f_mount(0, "", 0);  // 格式化后默认卸载驱动
+		#ifdef  FATFS_DEBUG
+		printf("SD Formatting ok\r\n");
+		#endif
+    return FR_OK;
+}
+
+
+
+/**********************检查目录*****************************/
+static uint8_t Check_whether_the_directory_exists(const char* path)
+{
+    
+    fres = f_stat(path, &fno);
+    if (fres == FR_OK && (fno.fattrib & AM_DIR)) {
+        return 1;  // 目录存在
+    }
+    return 0;  // 目录不存在
+}
+
+/************************创建目录***********************************/
+static uint8_t createDirectory(const char* path) {
+    if (!Check_whether_the_directory_exists(path)) {
+        fres = f_mkdir(path);
+        if(fres != FR_OK) {
+            //处理错误，显示错误消息
+					#ifdef  FATFS_DEBUG
+					printf("ERR create Directory :%d\r\n",fres);
+					#endif
+					    return 1;/*返回错误信息*/
+        } else {
+            // 目录成功创建
+					#ifdef  FATFS_DEBUG
+					    printf("create Directory ok\r\n");
+					#endif
+						  return 0;
+        }
+    } else {
+        // 目录已经存在
+			#ifdef  FATFS_DEBUG
+		     printf("Directory already exists\r\n");
+			#endif
+		     return 0;
+    }
+}
+
+/*****************************创建目录********************************/
+uint8_t use_createDirectory(void)
+{
+  createDirectory("/system");
+}
+
+
+
+
+
+/************************检查文件是否存在******************************/
+static uint8_t createFileIfNotExist(const char* folderPath, const char* filename) {
+    char fullPath[256];  // 假设文件路径长度不超过256。可以根据实际需要调整大小
+
+    // 判断是否为根目录
+    if (folderPath && *folderPath) {
+        sprintf(fullPath, "%s/%s", folderPath, filename);
+    } else {
+        sprintf(fullPath, "%s", filename); // 直接使用文件名，因为它在根目录
+    }
+
+    // 检查文件是否存在
+    fres = f_stat(fullPath, &fno);
+    if (fres == FR_OK) {
+        // 文件存在
+        return 1;
+    } else if (fres == FR_NO_FILE) {
+        // 文件不存在，尝试创建
+        fres = f_open(&file, fullPath, FA_WRITE | FA_CREATE_NEW);
+        if (fres == FR_OK) {
+            f_close(&file);
+            return 0;  // 文件已成功创建
+        } else {
+            return -1;  // 创建文件时发生错误
+        }
+    } else {
+        // 其他错误
+        return -1;
+    }
+}
+
+/*************************创建文件*************************/
+static uint8_t create_a_file(const char* folderPath, const char* filename) {
+    uint8_t result = createFileIfNotExist(folderPath, filename);
+
+    if (result == 1) {
+        // 文件已存在
+        #ifdef FATFS_DEBUG
+            printf("File already exists: %d\r\n", fres);
+        #endif
+    } else if (result == 0) {
+        // 文件已成功创建
+        #ifdef FATFS_DEBUG
+            printf("File created successfully: %d\r\n", fres);
+        #endif
+    } else {
+        // 发生错误
+        #ifdef FATFS_DEBUG
+            printf("Error creating file: %d\r\n", fres);
+        #endif
+    }
+
+    return 0;
+}
+
+/**************************创建文件************************************/
+uint8_t use_create_a_file(void)
+{
+  // 在根目录创建
+  // create_a_file("", "myfile.txt");
+  // 或在子文件夹创建
+  // create_a_file("system", "myfile.txt");
+    create_a_file("system", "file1.txt");
+	  create_a_file("system", "file2.txt");
+}
+
+/*************************写文件函数*************************************/
+
+uint8_t writeToFile(const char *filePath, const void *buffer, uint32_t length) {
+  
+    UINT bytesWritten;
+
+    // 打开文件
+    fres = f_open(&file, filePath, FA_WRITE | FA_OPEN_ALWAYS);
+    if (fres != FR_OK) {
+        // 文件打开失败
+        return -1;
+    }
+
+    // 将写指针移到文件末尾，以便在文件末尾追加数据
+    f_lseek(&file, f_size(&file));
+
+    // 写入数据
+    fres = f_write(&file, buffer, length, &bytesWritten);
+
+    // 关闭文件
+    f_close(&file);
+
+    // 检查是否所有数据都已写入
+    if (fres == FR_OK && bytesWritten == length) {
+        #ifdef FATFS_DEBUG
+            printf("File write length ok: %d\r\n", fres);
+        #endif
+			 return 0; // 成功
+    } else {
+			 #ifdef FATFS_DEBUG
+            printf("File write length err: %d\r\n", fres);
+        #endif
+			return -1; // 写入错误
     }
 }
 
 
+/**************************写入文件************************************/
+uint8_t use_writeToFile(void) {
+   
+	 uint8_t buffer[256];
+	 for(int i=0;i<256;i++)
+	{
+	  buffer[i]=i;
+	}
+
+   writeToFile("system/file1.txt", buffer, sizeof(buffer));
+
+    return 0;  
+}
+
+
+
+/**
+ * 读取文件的内容。
+ * @param filePath 要读取的文件的路径。
+ * @param buffer 存放读取数据的缓冲区。
+ * @param bufferSize 缓冲区的大小。
+ * @param offset 多少字符开始读取。
+ * @return 实际读取的字节数，或-1表示错误。
+ */
+uint32_t readFileContent(const char* filePath, void* buffer, int bufferSize, DWORD offset) {
+
+    UINT bytesRead;
+
+    fres = f_open(&file, filePath, FA_READ);
+    if (fres != FR_OK) {
+        // 文件打开失败
+        return -1;
+    }
+
+    // 设置读取的开始位置
+    if (f_lseek(&file, offset) != FR_OK) {
+        // 错误处理
+        f_close(&file);
+        return -1;
+    }
+
+    fres = f_read(&file, buffer, bufferSize - 1, &bytesRead);
+    if (fres != FR_OK) {
+        // 读取文件失败
+        f_close(&file);
+        return -1;
+    }
+
+//    buffer[bytesRead] = '\0';  // 添加字符串终止符
+
+    f_close(&file);  // 记得关闭文件
+		#ifdef FATFS_DEBUG
+	  printf("bytesRead num=%d\r\n",bytesRead);/*实际读取字节数*/
+    #endif
+    return bytesRead;  // 返回实际读取的字节数
+}
+
+
+/*使用读文件函数*/
+uint8_t use_readFileContent(void)
+{
+  uint8_t buffer[512];
+	memset(buffer, 0, sizeof(buffer));/*清空缓冲区*/
+	
+  uint32_t bytesRead = readFileContent("system/file1.txt", buffer, sizeof(buffer), 0); // 从第0个字节开始读取
+	HAL_Delay(10);
+	
+	
+	for(int i=0;i<512;i++)
+	printf("read sd buffer[%d]:%x\r\n",i,buffer[i]);
+
+}
+
+
+/*sd卡应用*/
+void sd_application(void)
+{
+//	 mkfs_sdcard();//格式化sd卡
+	 mount_sd();/*挂载sd卡*/
+   use_createDirectory();/*创建文件夹*/
+   use_create_a_file();/*创建文件*/ 
+   use_writeToFile();/*写文件*/
+   use_readFileContent();/*读文件*/
+}
 
 
 
@@ -537,7 +927,7 @@ void bsp_init(void)
    if (QSPI_OK != QSPI_W25Q64JV_DeviceID(id)) {
     while (1);
   }
-	 printf("QSPI_W25Q64JV id=%x%X\r\n",id[0],id[1]);
+//	 printf("QSPI_W25Q64JV id=%x%X\r\n",id[0],id[1]);
     HAL_Delay(1000);
 
   for(int i=0;i<=800;i+=2)
@@ -548,23 +938,23 @@ void bsp_init(void)
 
 
 	
- draw_grid(800, 480, 80, 80, 4,RED);
+   draw_grid(800, 480, 80, 80, 4,RED);
 
 	//testDrawXBM(&u8g2);
   //u8g2DrawTest(&u8g2);
 	
 	HAL_UART_Receive_IT(&huart4, &rx_data, 1);
-
+//  HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxPacket, sizeof(UartPacket));
+//   usart_radar_process();
 
 	
 	
 	  tp_dev.init();
-	  printf("run here \r\n");   
+//	  printf("run here \r\n");   
 	
-
+   
 		HAL_Delay(100);
-	
-
+    sd_application();
 }
 
 
@@ -628,10 +1018,10 @@ void application(void)
 //	
 	
 	
-	if(tick%800==0)
-	{
-	   readInternalVoltage();
-	}
+//	if(tick%800==0)
+//	{
+//	   readInternalVoltage();
+//	}
 
 	
 }

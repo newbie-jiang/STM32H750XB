@@ -131,7 +131,7 @@ int main(void)
   MX_FATFS_Init();
   MX_FMC_Init();
   MX_SPI1_Init();
-  MX_USB_DEVICE_Init();
+//  MX_USB_DEVICE_Init();
   MX_TIM5_Init();
   MX_TIM3_Init();
   MX_LTDC_Init();
@@ -145,7 +145,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-//MX1_ADC3_Init();
+
 	
 	  
 		  

@@ -2307,6 +2307,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\LCD\diaplay.c</FilePath>
             </File>
+            <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\BSP\config.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

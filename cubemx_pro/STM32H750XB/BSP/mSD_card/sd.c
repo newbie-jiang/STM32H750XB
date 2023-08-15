@@ -6,8 +6,8 @@
 #include "fatfs.h"
 
 ///*******************************fatfs*************************************/
-FATFS fs;                 // Work area (file system object) for logical drive
-FIL fil;                  // file objects
+static FATFS fs;                 // Work area (file system object) for logical drive
+static FIL fil;                  // file objects
 uint32_t byteswritten;                /* File write counts */
 uint32_t bytesread;                   /* File read counts */
 uint8_t wtext[] = "This is STM32H750XB working with FatFs"; /* File write buffer */
@@ -223,18 +223,18 @@ TestStatus eBuffercmp(uint32_t* pBuffer, uint32_t BufferLength)
 
 
 
-void mount_sd(void)
-{
-	retSD = f_mount(&fs, SDPath, 1);
-	if(retSD)
-	{
-			printf(" mount error : %d \r\n",retSD);
-			Error_Handler();
-	}
-	else
-			printf(" mount sucess!!! \r\n");
+//void mount_sd(void)
+//{
+//	retSD = f_mount(&fs, SDPath, 1);
+//	if(retSD)
+//	{
+//			printf(" mount error : %d \r\n",retSD);
+//			Error_Handler();
+//	}
+//	else
+//			printf(" mount sucess!!! \r\n");
 
-}
+//}
 
 
 
@@ -242,6 +242,9 @@ void mount_sd(void)
 
 void fatfs_test(void)
 {
+	
+	
+	
 
 printf("\r\n ****** FatFs Example ******\r\n\r\n");
     /*##-1- Register the file system object to the FatFs module ##############*/
